@@ -1,14 +1,16 @@
 NAME 			= ircserv
 CC				= c++
 
-UTILS_SRCS		= 
+CLASSES_SRCS	= Server.cpp
+UTILS_SRCS		= ft_convert.cpp ft_getipaddress.cpp ft_print.cpp
 MAIN_SRCS		= ft_irc.cpp
 
-SOURCES			= $(addprefix srcs/utils/, $(UTILS_SRCS)) \
+SOURCES			= $(addprefix srcs/classes/, $(CLASSES_SRCS)) \
+				  $(addprefix srcs/utils/, $(UTILS_SRCS)) \
  				  $(addprefix srcs/, $(MAIN_SRCS))
 OBJECTS			= $(SOURCES:.cpp=.o)
 
-HEADERS_FILES	= 
+HEADERS_FILES	= Server.hpp utils.hpp
 HEADERS			= $(addprefix includes/, $(HEADERS_FILES))
 
 FLAGS 			= -Wall -Wextra -Werror -g3 -std=c++98
