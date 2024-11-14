@@ -46,9 +46,8 @@ bool const& Server::isRunning(void) const {
 void Server::signalHandler(int status) {
     (void)status;
     _running = false;
-    std::cout << '\n';
-    ft_print_info("Exit signal received, exiting...");
-    _exit(status);
+    ft_print_info("\nExit signal received, exiting...");
+    _exit(128 + status);
 };
 
 // Launcher
