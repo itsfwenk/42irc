@@ -44,7 +44,6 @@ bool const& Server::isRunning(void) const {
 
 // Setters
 void Server::signalHandler(int status) {
-    (void)status;
     _running = false;
     ft_print_info("\nExit signal received, exiting...");
     _exit(128 + status);
