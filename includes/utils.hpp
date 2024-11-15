@@ -17,18 +17,20 @@
 # include <stdlib.h>
 # include <ifaddrs.h>
 # include <arpa/inet.h>
+# include <poll.h>
 
 // ft_convert.cpp
 int ft_get_converted_port(std::string port);
 
-// ft_getipaddress.cpp
-std::string ft_getipaddress(int sockfd);
-
 // ft_print.cpp
 void ft_print_logo(void);
 void ft_print_message(std::string msg, std::string color);
+void ft_print_success(std::string success);
 void ft_print_info(std::string info);
 void ft_print_warning(std::string warning);
 void ft_print_error(std::string error);
+
+// ft_setsockopts.cpp
+void ft_setsockopts(int sockfd);
 
 #endif

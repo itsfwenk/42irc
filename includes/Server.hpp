@@ -2,9 +2,16 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
+# define MAX_CLIENTS 100
+# define BUFFER_SIZE 1024
+
 # include <string>
 # include <signal.h>
+# include <cstring>
+# include <poll.h>
+# include <sstream>
 # include <map>
+# include <vector>
 
 # include "Channel.hpp"
 # include "Client.hpp"
@@ -15,7 +22,6 @@ class Server {
         int                            _sockfd;
         int                            _port;
         std::string                    _password;
-        std::string                    _ipAddress;
         static bool                    _running;
         static int                     _exitStatus;
 
@@ -35,7 +41,6 @@ class Server {
         int const& getSockFD(void);
         int const& getPort(void);
         std::string const& getPassword(void);
-        std::string const& getIPAddress(void);
         bool const& isRunning(void);
         int const& getExitStatus(void);
 

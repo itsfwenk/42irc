@@ -2,7 +2,7 @@ NAME 			= ircserv
 CC				= c++
 
 CLASSES_SRCS	= Channel.cpp Client.cpp Server.cpp
-UTILS_SRCS		= ft_convert.cpp ft_getipaddress.cpp ft_print.cpp
+UTILS_SRCS		= ft_convert.cpp ft_print.cpp ft_setsockopts.cpp
 MAIN_SRCS		= ft_irc.cpp
 
 SOURCES			= $(addprefix srcs/classes/, $(CLASSES_SRCS)) \
