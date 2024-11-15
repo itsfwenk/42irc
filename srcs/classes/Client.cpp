@@ -15,6 +15,10 @@ std::string const& Client::getNickname(void) {
 	return this->_nickname;
 };
 
+Server* Client::getServer(void) {
+	return this->_server;
+};
+
 bool const& Client::isLoggedIn(void) {
 	return this->_loggedIn;
 };
@@ -28,7 +32,7 @@ void Client::parseMessageData(std::string messageData) {
 	oss << this->getID();
 	while ((pos = this->_messageData.find("\n", pos)) != std::string::npos) {
 		std::string command = this->_messageData.substr(0, pos);
-		ft_print_info("Data received from client ID " + oss.str() + "!\n");
+		ft_print_info("Data received from client ID " + oss.str() + "!");
 
 		try {
 			this->execCommand(command);
@@ -45,11 +49,17 @@ void Client::setUsername(std::string username) {
 };
 
 void Client::setNickname(std::string nickname) {
+	Server* server = this->getServer();
+	Client* client = server->getClientByNickname(nickname);
+
+	if (client)
+		throw std::invalid_argument("This nickname is already used!");
 	this->_nickname = nickname;
 };
 
 // Commands
 void Client::execCommand(std::string command) {
+	Server* server = this->getServer();
 	std::istringstream iss(command);
 	
 	std::string prefix;
@@ -72,11 +82,16 @@ void Client::execCommand(std::string command) {
 		params.push_back(param);
 	};
 
-	this->sendMessage(cmd);
+	Command* selectedCommand = server->getCommandByName(cmd);
+	if (selectedCommand) {
+		ft_print_info(this->getNickname() + " is using " + selectedCommand->getName() + " command!");
+		selectedCommand->run(*this, params);
+	} else
+		throw std::invalid_argument("Cannot find " + cmd + " command.");
 };
 
 void Client::sendMessage(std::string message) {
-	std::string formattedMessage = ":ft_irc " + message + "\r\n";
+	std::string formattedMessage = SERVER_NAME + message + "\r\n";
 	std::ostringstream oss;
 	oss << this->getID();
 	ssize_t bytesSend = send(this->getID(), formattedMessage.c_str(), formattedMessage.size(), 0);

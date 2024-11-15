@@ -23,6 +23,7 @@ class Client {
 		std::string const& getUsername(void);
 		std::string const& getNickname(void);
 		bool const& isLoggedIn(void);
+		Server* getServer(void);
 
 		// Setters
 		void parseMessageData(std::string messageData);

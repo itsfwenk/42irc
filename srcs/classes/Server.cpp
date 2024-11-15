@@ -20,6 +20,28 @@ Server::Server(std::string port, std::string password): _sockfd(0), _password(pa
     sigaction(SIGTERM, &action, NULL);
     sigaction(SIGQUIT, &action, NULL);
     signal(SIGTSTP, SIG_IGN);
+
+    // Commands
+    PASS* passCMD = new PASS;
+
+    this->_commands.insert(std::pair<std::string, Command*>("PASS", passCMD));
+};
+
+Server::~Server(void) {
+    for (std::map<const int, Channel*>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++) {
+        if (it->second)
+            delete it->second;
+    };
+
+    for (std::map<const int, Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++) {
+        if (it->second)
+            delete it->second;
+    };
+
+    for (std::map<std::string, Command*>::iterator it = this->_commands.begin(); it != this->_commands.end(); it++) {
+        if (it->second)
+            delete it->second;
+    };
 };
 
 // Getters
@@ -43,58 +65,67 @@ int const& Server::getExitStatus(void) {
     return this->_exitStatus;
 };
 
-void Server::addChannel(Channel& channel) {
-    try {
-        this->getChannelByID(channel.getID());
+void Server::addChannel(Channel* channel) {
+    Channel* channelExists = this->getChannelByID(channel->getID());
+    if (channelExists) {
+        delete channelExists;
         throw std::runtime_error("This channel is already on the list.");
-    } catch (std::exception &err) {
-        (void)err;
-        this->_channels.insert(std::pair<const int, Channel&>(channel.getID(), channel));
     };
+    this->_channels.insert(std::pair<const int, Channel*>(channel->getID(), channel));
 };
 
-void Server::addClient(Client& client) {
-    try {
-        this->getClientByID(client.getID());
+void Server::addClient(Client* client) {
+    Client* clientExists = this->getClientByID(client->getID());
+    if (clientExists) {
+        delete client;
         throw std::runtime_error("This client is already on the list.");
-    } catch (std::exception &err) {
-        (void)err;
-        if (this->_clients.size() == MAX_CLIENTS)
-            throw std::runtime_error("Too many clients.");
-        this->_clients.insert(std::pair<const int, Client&>(client.getID(), client));
     };
+    this->_clients.insert(std::pair<const int, Client*>(client->getID(), client));
 };
 
 void Server::rmChannel(int channelId) {
-    try {
-        this->getChannelByID(channelId);
+    Channel* channelExists = this->getChannelByID(channelId);
+    if (channelExists) {
+        delete channelExists;
         this->_channels.erase(channelId);
-    } catch (std::exception &err) {
-        (void)err;
     };
 };
 
 void Server::rmClient(int clientId) {
-    try {
-        this->getClientByID(clientId);
+    Client* clientExists = this->getClientByID(clientId);
+    if (clientExists) {
+        delete clientExists;
         this->_clients.erase(clientId);
-    } catch (std::exception &err) {
-        (void)err;
     };
 };
 
-Channel const& Server::getChannelByID(int channelId) {
-    std::map<const int, Channel&>::const_iterator it = this->_channels.find(channelId);
+Channel* Server::getChannelByID(int channelId) {
+    std::map<const int, Channel*>::iterator it = this->_channels.find(channelId);
     if (it == this->_channels.end())
-        throw std::invalid_argument("Cannot find any Channel with this ID.");
+        return NULL;
     return it->second;
 };
 
-Client const& Server::getClientByID(int clientId) {
-    std::map<const int, Client&>::const_iterator it = this->_clients.find(clientId);
+Client* Server::getClientByID(int clientId) {
+    std::map<const int, Client*>::iterator it = this->_clients.find(clientId);
     if (it == this->_clients.end())
-        throw std::invalid_argument("Cannot find any Client with this ID.");
+        return NULL;
     return it->second;
+};
+
+Command* Server::getCommandByName(std::string name) {
+    std::map<std::string, Command*>::iterator it = this->_commands.find(name);
+    if (it == this->_commands.end())
+        return NULL;
+    return it->second;
+};
+
+Client* Server::getClientByNickname(std::string nickname) {
+    for (std::map<const int, Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++) {
+        if (it->second->getNickname() == nickname && it->second->isLoggedIn())
+            return it->second;
+    };
+    throw std::invalid_argument("Cannot find any Client with this nickname.");
 };
 
 // Setters
@@ -134,7 +165,7 @@ void Server::launch(void) {
 
     std::ostringstream oss;
     oss << ntohs(server_addr.sin_port);
-    ft_print_success("Server loaded successfully on port " + oss.str() + "!");
+    ft_print_success("Server loaded successfully on port " + oss.str() + "! (Password: \"" + this->getPassword() + "\")");
 
     pollfd server_pollfd;
     memset(&server_pollfd, 0, sizeof(server_pollfd));
@@ -168,12 +199,12 @@ void Server::launch(void) {
                     client_pollfd.events = POLLIN;
                     pollfds.push_back(client_pollfd);
 
-                    Client newClient(clientFD, this);
+                    Client* newClient = new Client(clientFD, this);
                     this->addClient(newClient);
 
                     std::ostringstream oss;
                     oss << clientFD;
-                    ft_print_success("New client connection! (ID " + oss.str() + ").");
+                    ft_print_success("New client connection! (ID " + oss.str() + ")");
                 } else {
                     char buffer[1024] = {0};
                     int bytes_read = recv(pollfds[i].fd, buffer, sizeof(buffer) - 1, 0);
@@ -184,12 +215,12 @@ void Server::launch(void) {
                         close(pollfds[i].fd);
                         pollfds.erase(pollfds.begin() + i);
                         this->rmClient(pollfds[i].fd);
-                        ft_print_warning("A client just logged out! (ID " + oss.str() + ").");
+                        ft_print_warning("A client just logged out! (ID " + oss.str() + ")");
                         --i;
                     } else {
                         try {
-                            Client selectedClient = this->getClientByID(pollfds[i].fd);
-                            selectedClient.parseMessageData(std::string(buffer));
+                            Client* selectedClient = this->getClientByID(pollfds[i].fd);
+                            selectedClient->parseMessageData(std::string(buffer));
                         } catch (std::exception &err) {
                             ft_print_warning(err.what());
                             close(pollfds[i].fd);

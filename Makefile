@@ -1,20 +1,25 @@
 NAME 			= ircserv
 CC				= c++
 
-CLASSES_SRCS	= Channel.cpp Client.cpp Server.cpp
+CLASSES_SRCS	= Channel.cpp Client.cpp Command.cpp Server.cpp
+COMMANDS_SRCS	= PASS.cpp
 UTILS_SRCS		= ft_convert.cpp ft_print.cpp ft_setsockopts.cpp
 MAIN_SRCS		= ft_irc.cpp
 
 SOURCES			= $(addprefix srcs/classes/, $(CLASSES_SRCS)) \
+				  $(addprefix srcs/commands/, $(COMMANDS_SRCS)) \
 				  $(addprefix srcs/utils/, $(UTILS_SRCS)) \
  				  $(addprefix srcs/, $(MAIN_SRCS))
 OBJECTS			= $(SOURCES:.cpp=.o)
 
-HEADERS_FILES	= Channel.hpp Client.hpp Server.hpp utils.hpp
-HEADERS			= $(addprefix includes/, $(HEADERS_FILES))
+HEADERS_FILES	= Channel.hpp Client.hpp Command.hpp Server.hpp utils.hpp
+CMD_HEADERS		= PASS.hpp
+
+HEADERS			= $(addprefix includes/commands/, $(CMD_HEADERS)) \
+				  $(addprefix includes/, $(HEADERS_FILES))
 
 FLAGS 			= -Wall -Wextra -Werror -g3 -std=c++98
-OPTIONS 		= -I includes
+OPTIONS 		= -I includes -I includes/commands
 
 #################################################################################
 
