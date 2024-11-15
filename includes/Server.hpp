@@ -27,6 +27,7 @@ class Server {
 
         std::map<const int, Channel&>  _channels;
         std::map<const int, Client&>   _clients;
+        std::map<std::string, Command
 
     public:
         Server(std::string port, std::string password);

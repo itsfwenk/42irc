@@ -168,7 +168,7 @@ void Server::launch(void) {
                     client_pollfd.events = POLLIN;
                     pollfds.push_back(client_pollfd);
 
-                    Client newClient(clientFD);
+                    Client newClient(clientFD, this);
                     this->addClient(newClient);
 
                     std::ostringstream oss;
