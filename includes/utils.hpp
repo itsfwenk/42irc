@@ -22,7 +22,7 @@
 int ft_get_converted_port(std::string port);
 
 // ft_getipaddress.cpp
-std::string ft_getipaddress(void);
+std::string ft_getipaddress(int sockfd);
 
 // ft_print.cpp
 void ft_print_logo(void);

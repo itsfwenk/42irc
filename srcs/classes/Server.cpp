@@ -9,11 +9,6 @@ Server::Server(std::string port, std::string password): _password(password) {
         throw std::invalid_argument("Wrong port argument, must be a number between 0 and 65535.");
     this->_port = convertedPort;
 
-    std::string ipAddress = ft_getipaddress();
-    if (ipAddress.empty())
-        throw std::runtime_error("Cannot find host IP address.");
-    this->_ipAddress = ipAddress;
-
     // Signals handler
     struct sigaction action;
     action.sa_handler = this->signalHandler;

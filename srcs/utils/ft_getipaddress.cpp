@@ -1,26 +1,13 @@
 #include "utils.hpp"
 
-std::string ft_getipaddress(void) {
-    struct ifaddrs *ifAddrStruct = NULL;
-    struct ifaddrs *ifa = NULL;
-    void *tmpAddrPtr = NULL;
-    
-    getifaddrs(&ifAddrStruct);
+std::string ft_getipaddress(int sockfd) {
+    struct sockaddr_in addr;
+    socklen_t addr_len = sizeof(addr);
 
-    for (ifa = ifAddrStruct; ifa; ifa = ifa->ifa_next) {
-        if (ifa->ifa_addr->sa_family == AF_INET) {
-            tmpAddrPtr = &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
-            char addressBuffer[INET_ADDRSTRLEN];
-            inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
-            
-            if (std::string(ifa->ifa_name) == "eth0" || std::string(ifa->ifa_name) == "wlan0") {
-                std::string ipAddress(addressBuffer);
-                freeifaddrs(ifAddrStruct);
-                return ipAddress;
-            };
-        };
-    };
+    if (getsockname(sockfd, (struct sockaddr*)&addr, &addr_len) == -1)
+        return "";
 
-    freeifaddrs(ifAddrStruct);
-    return "";
+    char ip[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &addr.sin_addr, ip, sizeof(ip));
+    return std::string(ip);
 };
