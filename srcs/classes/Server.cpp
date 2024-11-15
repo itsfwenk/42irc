@@ -94,6 +94,7 @@ void Server::rmChannel(int channelId) {
 void Server::rmClient(int clientId) {
     Client* clientExists = this->getClientByID(clientId);
     if (clientExists) {
+        close(clientId);
         delete clientExists;
         this->_clients.erase(clientId);
     };
@@ -176,14 +177,29 @@ void Server::launch(void) {
     pollfds.push_back(server_pollfd);
 
     while (this->isRunning()) {
-        int ret = poll(pollfds.data(), pollfds.size(), -1);
+        int ret = poll(pollfds.data(), pollfds.size(), 500);
         if (ret < 0) {
             this->_running = false;
             break;
         };
 
         for (size_t i = 0; i < pollfds.size(); i++) {
+            int pollFD = pollfds[i].fd;
+
+            Client* selectedClient = this->getClientByID(pollFD);
+            if (selectedClient && (!selectedClient->isLoggedIn() && std::time(NULL) - selectedClient->getAcceptedAt() >= 5)) {
+                std::ostringstream oss;
+                oss << pollFD;
+
+                this->rmClient(pollFD);
+                pollfds.erase(pollfds.begin() + i);
+                ft_print_warning("Not identified client has just been logged out automatically! (ID " + oss.str() + ")");
+                --i;
+                continue;
+            };
+
             if (pollfds[i].revents & POLLIN) {
+
                 if (pollfds[i].fd == sockFD) {
                     int clientFD = accept(sockFD, NULL, NULL);
                     if (clientFD < 0) {
@@ -206,29 +222,21 @@ void Server::launch(void) {
                     oss << clientFD;
                     ft_print_success("New client connection! (ID " + oss.str() + ")");
                 } else {
+                    Client* selectedClient = this->getClientByID(pollfds[i].fd);
+                    if (!selectedClient)
+                        continue;
+
                     char buffer[1024] = {0};
-                    int bytes_read = recv(pollfds[i].fd, buffer, sizeof(buffer) - 1, 0);
+                    int bytes_read = recv(pollFD, buffer, sizeof(buffer) - 1, 0);
                     if (bytes_read <= 0) {
                         std::ostringstream oss;
-                        oss << pollfds[i].fd;
-
-                        close(pollfds[i].fd);
+                        oss << pollFD;
+                        this->rmClient(pollFD);
                         pollfds.erase(pollfds.begin() + i);
-                        this->rmClient(pollfds[i].fd);
                         ft_print_warning("A client just logged out! (ID " + oss.str() + ")");
                         --i;
-                    } else {
-                        try {
-                            Client* selectedClient = this->getClientByID(pollfds[i].fd);
-                            selectedClient->parseMessageData(std::string(buffer));
-                        } catch (std::exception &err) {
-                            ft_print_warning(err.what());
-                            close(pollfds[i].fd);
-                            pollfds.erase(pollfds.begin() + i);
-                            this->rmClient(pollfds[i].fd);
-                            --i;
-                        };
-                    };
+                    } else
+                        selectedClient->parseMessageData(std::string(buffer));
                 };
             };
         };

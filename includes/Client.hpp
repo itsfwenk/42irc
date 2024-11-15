@@ -3,6 +3,7 @@
 # define CLIENT_HPP
 
 # include <sstream>
+# include <ctime>
 # include "utils.hpp"
 
 class Server;
@@ -12,6 +13,7 @@ class Client {
 		std::string		_username;
 		std::string		_nickname;
 		bool			_loggedIn;
+		time_t			_acceptedAt;
 		std::string		_messageData;
 		Server*			_server;
 
@@ -22,6 +24,7 @@ class Client {
 		int const& getID(void);
 		std::string const& getUsername(void);
 		std::string const& getNickname(void);
+		time_t const& getAcceptedAt(void);
 		bool const& isLoggedIn(void);
 		Server* getServer(void);
 

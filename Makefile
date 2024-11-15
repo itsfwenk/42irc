@@ -11,6 +11,7 @@ SOURCES			= $(addprefix srcs/classes/, $(CLASSES_SRCS)) \
 				  $(addprefix srcs/utils/, $(UTILS_SRCS)) \
  				  $(addprefix srcs/, $(MAIN_SRCS))
 OBJECTS			= $(SOURCES:.cpp=.o)
+OBJECTS_FOLDER  = $(addprefix objs/, $(OBJECTS))
 
 HEADERS_FILES	= Channel.hpp Client.hpp Command.hpp Server.hpp utils.hpp
 CMD_HEADERS		= PASS.hpp
@@ -32,13 +33,13 @@ NC 		 = '\033[0m'
 
 #################################################################################
 
-%.o: %.cpp $(HEADERS)
-	@mkdir -p $(dir objs/$@)
-	@$(CC) $(FLAGS) -c $(OPTIONS) $< -o objs/$@
+objs/%.o: %.cpp $(HEADERS)
+	@mkdir -p $(dir $@)
+	@$(CC) $(FLAGS) -c $(OPTIONS) $< -o $@
 	@echo $(GREEN)✅ $< compiled! $(NC)
 
-$(NAME): $(OBJECTS) $(HEADERS)
-	@$(CC) $(FLAGS) $(OPTIONS) -o $@ $(addprefix objs/, $(OBJECTS))
+$(NAME): $(OBJECTS_FOLDER) $(HEADERS)
+	@$(CC) $(FLAGS) $(OPTIONS) -o $@ $(OBJECTS_FOLDER)
 	@echo $(BLUE)✅ $@ built! $(NC)
 
 all: $(NAME)

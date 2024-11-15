@@ -1,6 +1,6 @@
 #include "Client.hpp"
 
-Client::Client(int id, Server* server): _id(id), _username("Default Username"), _nickname("Default Nickname"), _loggedIn(false), _server(server) {};
+Client::Client(int id, Server* server): _id(id), _username("Default Username"), _nickname("Default Nickname"), _loggedIn(false), _acceptedAt(std::time(NULL)), _server(server) {};
 
 // Getters
 int const& Client::getID(void) {
@@ -13,6 +13,10 @@ std::string const& Client::getUsername(void) {
 
 std::string const& Client::getNickname(void) {
 	return this->_nickname;
+};
+
+time_t const& Client::getAcceptedAt(void) {
+	return this->_acceptedAt;
 };
 
 Server* Client::getServer(void) {
@@ -77,6 +81,8 @@ void Client::execCommand(std::string command) {
 		iss >> prefix;
 
 	iss >> cmd;
+	if (!cmd.length())
+		throw std::invalid_argument("Empty command.");
 
 	std::string param;
 	while (iss >> param) {
