@@ -17,7 +17,7 @@ void Client::parseMessageData(std::string messageData) {
 	while ((pos = this->_messageData.find("\n", pos)) != std::string::npos) {
 		std::string command = this->_messageData.substr(0, pos);
 		ft_print_info("Data received from client ID " + oss.str() + "!");
-		
+		std::cout << command << std::endl;
 		this->_messageData.erase(0, pos + 1);
 	};
 };
