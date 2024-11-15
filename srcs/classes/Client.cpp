@@ -57,6 +57,10 @@ void Client::setNickname(std::string nickname) {
 	this->_nickname = nickname;
 };
 
+void Client::setLoggedIn(bool loggedIn) {
+	this->_loggedIn = loggedIn;
+};
+
 // Commands
 void Client::execCommand(std::string command) {
 	Server* server = this->getServer();
@@ -84,6 +88,12 @@ void Client::execCommand(std::string command) {
 
 	Command* selectedCommand = server->getCommandByName(cmd);
 	if (selectedCommand) {
+		std::ostringstream oss;
+		oss << selectedCommand->getReqArgs();
+
+		if ((size_t)selectedCommand->getReqArgs() != params.size())
+			throw std::invalid_argument("Command " + cmd + ": wrong number of argumets (expected " + oss.str() + ")");
+
 		ft_print_info(this->getNickname() + " is using " + selectedCommand->getName() + " command!");
 		selectedCommand->run(*this, params);
 	} else

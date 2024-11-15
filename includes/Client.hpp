@@ -29,6 +29,7 @@ class Client {
 		void parseMessageData(std::string messageData);
 		void setUsername(std::string username);
 		void setNickname(std::string nickname);
+		void setLoggedIn(bool loggedIn);
 
 		// Commands
 		void execCommand(std::string command);

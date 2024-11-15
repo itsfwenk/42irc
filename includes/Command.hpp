@@ -9,17 +9,17 @@ class Client;
 class Command {
 	private:
 		std::string 	_name;
-		int				_minargs;
+		int				_reqargs;
 		bool			_opcmd;
 		bool			_mustbelogged;
 
 	public:
-		Command(std::string name, int minargs, bool opcmd, bool mustbelogged);
+		Command(std::string name, int reqargs, bool opcmd, bool mustbelogged);
 		virtual ~Command(void);
 
 		// Getters
 		std::string const& getName(void);
-		int const& getMinArgs(void);
+		int const& getReqArgs(void);
 		bool const& isOpCMD(void);
 		bool const& mustBeLogged(void);
 
