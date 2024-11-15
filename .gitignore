@@ -54,3 +54,4 @@ dkms.conf
 # ft_irc
 objs/
 ircserv
+.vscode/
