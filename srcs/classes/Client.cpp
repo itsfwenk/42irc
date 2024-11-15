@@ -54,6 +54,9 @@ void Client::setNickname(std::string nickname) {
 
 	if (client)
 		throw std::invalid_argument("This nickname is already used!");
+	else if (nickname == "Default Username")
+		throw std::invalid_argument("This nickname cannot be used!");
+
 	this->_nickname = nickname;
 };
 
