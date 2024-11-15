@@ -70,7 +70,7 @@ void Server::rmChannel(int channelId) {
         this->getChannelByID(channelId);
         this->_channels.erase(channelId);
     } catch (std::exception &err) {
-        throw err;
+        (void)err;
     };
 };
 
@@ -79,7 +79,7 @@ void Server::rmClient(int clientId) {
         this->getClientByID(clientId);
         this->_clients.erase(clientId);
     } catch (std::exception &err) {
-        throw err;
+        (void)err;
     };
 };
 
@@ -190,8 +190,8 @@ void Server::launch(void) {
                         try {
                             Client selectedClient = this->getClientByID(pollfds[i].fd);
                             selectedClient.parseMessageData(std::string(buffer));
-                        } catch (std::exception &e) {
-                            ft_print_warning(e.what());
+                        } catch (std::exception &err) {
+                            ft_print_warning(err.what());
                             close(pollfds[i].fd);
                             pollfds.erase(pollfds.begin() + i);
                             this->rmClient(pollfds[i].fd);
