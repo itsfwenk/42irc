@@ -1,6 +1,7 @@
 #include "Server.hpp"
 
 bool Server::_running = false;
+int Server::_exitStatus = 0;
 
 Server::Server(std::string port, std::string password): _password(password) {
     int convertedPort = ft_get_converted_port(port);
@@ -42,11 +43,16 @@ bool const& Server::isRunning(void) const {
     return this->_running;
 };
 
+int const& Server::getExitStatus(void) const {
+    return this->_exitStatus;
+};
+
 // Setters
 void Server::signalHandler(int status) {
     _running = false;
-    ft_print_info("\nExit signal received, exiting...");
-    _exit(128 + status);
+    _exitStatus = 128 + status;
+    std::cout << std::endl;
+    ft_print_info("Exit signal received, exiting...");
 };
 
 // Launcher

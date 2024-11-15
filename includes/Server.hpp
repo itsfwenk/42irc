@@ -12,6 +12,7 @@ class Server {
         std::string     _password;
         std::string     _ipAddress;
         static bool     _running;
+        static int      _exitStatus;
 
     public:
         Server(std::string port, std::string password);
@@ -21,6 +22,7 @@ class Server {
         std::string const& getPassword(void) const;
         std::string const& getIPAddress(void) const;
         bool const& isRunning(void) const;
+        int const& getExitStatus(void) const;
 
         // Setters
         static void signalHandler(int status);

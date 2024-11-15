@@ -14,11 +14,11 @@ int main(int argc, char** argv) {
     try {
         Server IRC_Server = Server(port, password);
         IRC_Server.launch();
+        return IRC_Server.getExitStatus();
     } catch (std::exception const& err) {
         ft_print_error(err.what());
         return 1;
     };
     
-    ft_print_info("Exiting...");
     return 0;
 };
