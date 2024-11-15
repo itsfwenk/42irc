@@ -1,6 +1,6 @@
 #include "Client.hpp"
 
-Client::Client(int id, Server* server): _id(id), _username("Default Username"), _nickname("Default nickname"), _loggedIn(false), _server(server) {};
+Client::Client(int id, Server* server): _id(id), _username("Default Username"), _nickname("Default Nickname"), _loggedIn(false), _server(server) {};
 
 // Getters
 int const& Client::getID(void) {
