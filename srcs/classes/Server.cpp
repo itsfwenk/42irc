@@ -3,11 +3,15 @@
 bool Server::_running = false;
 int Server::_exitStatus = 0;
 
-Server::Server(std::string port, std::string password): _sockfd(0), _password(password) {
+Server::Server(std::string port, std::string password): _sockfd(0) {
     int convertedPort = ft_get_converted_port(port);
     if (convertedPort == -1)
         throw std::invalid_argument("Wrong port argument, must be a number between 0 and 65535.");
     this->_port = convertedPort;
+
+    if (password.empty())
+        throw std::invalid_argument("Password cannot be empty.");
+    this->_password = password;
 
     // Signals handler
     struct sigaction action;
