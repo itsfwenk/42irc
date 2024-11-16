@@ -37,14 +37,7 @@ void Client::parseMessageData(std::string messageData) {
 	while ((pos = this->_messageData.find("\n", pos)) != std::string::npos) {
 		std::string command = this->_messageData.substr(0, pos);
 		ft_print_info("Data received from client ID " + oss.str() + "!");
-
-		try {
-			this->execCommand(command);
-		} catch (std::exception &e) {
-			ft_print_warning(e.what());
-			this->sendMessage(ft_formatmessage(ERR_UNKNOWNCOMMAND, e.what(), this));
-		};
-
+		this->execCommand(command);
 		this->_messageData.erase(0, pos + 1);
 	};
 };
@@ -101,13 +94,16 @@ void Client::execCommand(std::string command) {
 		std::ostringstream oss;
 		oss << selectedCommand->getReqArgs();
 
-		if ((size_t)selectedCommand->getReqArgs() != params.size())
+		if ((size_t)selectedCommand->getReqArgs() > params.size())
 			throw std::invalid_argument("Command " + cmd + ": wrong number of argumets (expected " + oss.str() + ")");
 
 		ft_print_info(this->getNickname() + " is using " + selectedCommand->getName() + " command!");
 		selectedCommand->run(this, params);
-	} else
-		throw std::invalid_argument("Cannot find " + cmd + " command.");
+	} else {
+		std::string warning = "Cannot find " + cmd + " command.";
+		this->sendMessage(ft_formatmessage(ERR_UNKNOWNCOMMAND, warning, this));
+		ft_print_warning(warning);
+	};
 };
 
 void Client::sendMessage(std::string message) {
