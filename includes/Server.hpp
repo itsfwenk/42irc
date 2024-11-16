@@ -4,7 +4,6 @@
 
 # define MAX_CLIENTS 100
 # define BUFFER_SIZE 1024
-# define SERVER_NAME ":ft_irc "
 
 # include <string>
 # include <signal.h>
