@@ -56,6 +56,10 @@ class Server {
         bool const& isRunning(void);
         int const& getExitStatus(void);
 
+        std::map<const int, Channel*>& getChannels(void);
+        std::map<const int, Client*>& getClients(void);
+        std::map<std::string, Command*>& getCommands(void);
+
         Channel* getChannelByID(int channelId);
         Client* getClientByID(int clientId);
         Client* getClientByNickname(std::string nickname);
@@ -68,6 +72,7 @@ class Server {
 
         // Launcher
         void launch(void);
+        void sendMessage(std::string message);
 };
 
 # include "Command.hpp"
