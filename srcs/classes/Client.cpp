@@ -137,7 +137,5 @@ void Client::sendMessage(std::string message) {
 	std::string formattedMessage = message + "\r\n";
 	std::ostringstream oss;
 	oss << this->getID();
-	ssize_t bytesSend = send(this->getID(), formattedMessage.c_str(), formattedMessage.size(), 0);
-	if (bytesSend < 0)
-		throw std::runtime_error("Cannot send message to client ID " + oss.str() + ".");
+	send(this->getID(), formattedMessage.c_str(), formattedMessage.size(), 0);
 };
