@@ -15,7 +15,7 @@ class Channel {
 		bool	_userLimited;
 		bool	_restricted;
 		bool	_inviteOnly;
-		bool	_topicRestrict;
+		bool	_topicRestricted;
 		std::string		_password;
 		std::string		_name;
 		std::string		_topic;
