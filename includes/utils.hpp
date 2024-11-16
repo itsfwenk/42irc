@@ -45,6 +45,8 @@
 # include <arpa/inet.h>
 # include <poll.h>
 
+# include "RPN.hpp"
+
 class Channel;
 class Client;
 

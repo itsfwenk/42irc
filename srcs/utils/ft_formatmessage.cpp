@@ -7,5 +7,7 @@ std::string ft_formatmessage(std::string code, std::string message, Client* clie
 };
 
 std::string ft_formatmessage(std::string code, std::string message, Client* client, Channel* channel) {
+    if (!channel)
+        return ft_formatmessage(code, message, client);
     return code + " " + client->getNickname() + " #" + channel->getName() + " :" + message;
 };

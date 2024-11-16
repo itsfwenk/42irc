@@ -19,6 +19,7 @@
 # include "utils.hpp"
 
 // Commands
+# include "BOT.hpp"
 # include "CAP.hpp"
 # include "NICK.hpp"
 # include "PASS.hpp"
@@ -58,6 +59,7 @@ class Server {
         Client* getClientByNickname(std::string nickname);
 
         Command* getCommandByName(std::string name);
+        Channel* getChannelByName(std::string name);
 
         // Setters
         static void signalHandler(int status);

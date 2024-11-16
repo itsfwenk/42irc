@@ -26,6 +26,7 @@ Server::Server(std::string port, std::string password): _sockfd(0) {
     signal(SIGTSTP, SIG_IGN);
 
     // Commands
+    this->_commands.insert(std::pair<std::string, Command*>("!bot", new BOT));
     this->_commands.insert(std::pair<std::string, Command*>("CAP", new CAP));
     this->_commands.insert(std::pair<std::string, Command*>("NICK", new NICK));
     this->_commands.insert(std::pair<std::string, Command*>("PASS", new PASS));
@@ -128,6 +129,14 @@ Command* Server::getCommandByName(std::string name) {
 Client* Server::getClientByNickname(std::string nickname) {
     for (std::map<const int, Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++) {
         if (it->second->getNickname() == nickname && it->second->isLoggedIn())
+            return it->second;
+    };
+    return NULL;
+};
+
+Channel* Server::getChannelByName(std::string name) {
+    for (std::map<const int, Channel*>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++) {
+        if (it->second->getName() == name)
             return it->second;
     };
     return NULL;

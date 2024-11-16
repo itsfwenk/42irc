@@ -1,13 +1,13 @@
 #pragma once
-#ifndef NICK_HPP
-# define NICK_HPP
+#ifndef BOT_HPP
+# define BOT_HPP
 
 # include "Command.hpp"
 
-class NICK : public Command {
+class BOT : public Command {
 	public:
-		NICK(void);
-		virtual ~NICK(void);
+		BOT(void);
+		virtual ~BOT(void);
 
 		virtual void run(Client* client, Channel* channel, std::vector<std::string> params);
 };

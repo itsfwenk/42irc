@@ -1,6 +1,6 @@
 #include "Command.hpp"
 
-Command::Command(std::string name, int reqargs, bool opcmd, bool mustbelogged): _name(name), _reqargs(reqargs), _opcmd(opcmd), _mustbelogged(mustbelogged) {
+Command::Command(std::string name, int reqargs, bool opcmd, bool mustbelogged, bool insidechannel): _name(name), _reqargs(reqargs), _opcmd(opcmd), _mustbelogged(mustbelogged), _insidechannel(insidechannel) {
 	ft_print_info("Command " + name + " loaded!");
 };
 
@@ -21,4 +21,8 @@ bool const& Command::isOpCMD(void) {
 
 bool const& Command::mustBeLogged(void) {
 	return this->_mustbelogged;
+};
+
+bool const& Command::insideChannel(void) {
+	return this->_insidechannel;
 };

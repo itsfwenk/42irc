@@ -1,6 +1,6 @@
 #include "Client.hpp"
 
-Client::Client(int id, Server* server): _id(id), _username("Default Username"), _nickname("Default Nickname"), _loggedIn(false), _acceptedAt(std::time(NULL)), _server(server) {};
+Client::Client(int id, Server* server): _id(id), _username("username"), _nickname("nickname"), _loggedIn(false), _acceptedAt(std::time(NULL)), _server(server) {};
 
 // Getters
 int const& Client::getID(void) {
@@ -36,8 +36,12 @@ void Client::parseMessageData(std::string messageData) {
 	oss << this->getID();
 	while ((pos = this->_messageData.find("\n", pos)) != std::string::npos) {
 		std::string command = this->_messageData.substr(0, pos);
-		ft_print_info("Data received from client ID " + oss.str() + "!");
-		this->execCommand(command);
+		ft_print_info("Data received from client ID " + oss.str() + " (" + this->getNickname() + ") !");
+		try {
+			this->execCommand(command);
+		} catch (std::exception& err) {
+			ft_print_warning(err.what());
+		};
 		this->_messageData.erase(0, pos + 1);
 	};
 };
@@ -52,7 +56,7 @@ void Client::setNickname(std::string nickname) {
 
 	if (client)
 		throw std::invalid_argument("This nickname is already used!");
-	else if (nickname == "Default Username")
+	else if (nickname == "nickname")
 		throw std::invalid_argument("This nickname cannot be used!");
 
 	this->_nickname = nickname;
@@ -90,18 +94,41 @@ void Client::execCommand(std::string command) {
 	};
 
 	Command* selectedCommand = server->getCommandByName(cmd);
+	Channel* selectedChannel = params.size() ? server->getChannelByName(params[0]) : NULL;
+	std::string warning;
+
+	if (selectedChannel)
+		params.erase(params.begin());
+
 	if (selectedCommand) {
 		std::ostringstream oss;
 		oss << selectedCommand->getReqArgs();
 
 		if ((size_t)selectedCommand->getReqArgs() > params.size())
-			throw std::invalid_argument("Command " + cmd + ": wrong number of argumets (expected " + oss.str() + ")");
+			warning = "Command " + cmd + ": wrong number of argumets (expected at least " + oss.str() + " argument(s))";
+		else if (selectedCommand->mustBeLogged() && !this->isLoggedIn())
+			warning = "You must be logged in to run this command!";
+		else if (selectedCommand->insideChannel() && !selectedChannel)
+			warning = "You must be inside a channel to run this command!";
+		else if (selectedCommand->isOpCMD()) {
+			// Vérifier si on est dans un salon valide.
+			// Vérifier si le client est un OP.
+		};
 
-		ft_print_info(this->getNickname() + " is using " + selectedCommand->getName() + " command!");
-		selectedCommand->run(this, params);
+		if (warning.length()) {
+			this->sendMessage(ft_formatmessage(ERR_UNKNOWNCOMMAND, warning, this, selectedChannel));
+			throw std::invalid_argument(warning);
+		};
+
+		if (cmd == "!bot")
+			ft_print_info(this->getNickname() + " is using " + params[0] + " bot command!");
+		else
+			ft_print_info(this->getNickname() + " is using " + selectedCommand->getName() + " command!");
+
+		selectedCommand->run(this, selectedChannel, params);
 	} else {
-		std::string warning = "Cannot find " + cmd + " command.";
-		this->sendMessage(ft_formatmessage(ERR_UNKNOWNCOMMAND, warning, this));
+		warning = "Cannot find " + cmd + " command.";
+		this->sendMessage(ft_formatmessage(ERR_UNKNOWNCOMMAND, warning, this, selectedChannel));
 		ft_print_warning(warning);
 	};
 };

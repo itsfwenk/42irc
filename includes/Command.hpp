@@ -5,6 +5,7 @@
 # include <vector>
 # include "utils.hpp"
 
+class Channel;
 class Client;
 class Command {
 	private:
@@ -12,9 +13,10 @@ class Command {
 		int				_reqargs;
 		bool			_opcmd;
 		bool			_mustbelogged;
+		bool			_insidechannel;
 
 	public:
-		Command(std::string name, int reqargs, bool opcmd, bool mustbelogged);
+		Command(std::string name, int reqargs, bool opcmd, bool mustbelogged, bool insidechannel);
 		virtual ~Command(void);
 
 		// Getters
@@ -22,11 +24,13 @@ class Command {
 		int const& getReqArgs(void);
 		bool const& isOpCMD(void);
 		bool const& mustBeLogged(void);
+		bool const& insideChannel(void);
 
 		// Run
-		virtual void run(Client* client, std::vector<std::string> params) = 0;
+		virtual void run(Client* client, Channel* channel, std::vector<std::string> params) = 0;
 };
 
+# include "Channel.hpp"
 # include "Client.hpp"
 
 #endif

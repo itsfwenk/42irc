@@ -9,7 +9,7 @@ class CAP : public Command {
 		CAP(void);
 		virtual ~CAP(void);
 
-		virtual void run(Client* client, std::vector<std::string> params);
+		virtual void run(Client* client, Channel* channel, std::vector<std::string> params);
 };
 
 #endif
