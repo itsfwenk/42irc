@@ -14,8 +14,9 @@ void NICK::run(Client* client, Channel* channel, std::vector<std::string> params
 	try {
         client->setNickname(nickname);
     } catch (std::exception &err) {
-        return client->sendMessage(ft_formatmessage(ERR_NICKNAMEINUSE, err.what(), client, channel));
+        (void)err;
+        return client->sendMessage(ft_formatmessage(ERR_NICKNAMEINUSE, nickname, client, channel));
     };
 
-    return client->sendMessage(": " + oldnickname + " NICK :" + nickname);
+    return client->sendMessage(":" + oldnickname + "!" + client->getUsername() + "@localhost NICK " + nickname);
 };

@@ -30,6 +30,7 @@ Server::Server(std::string port, std::string password): _sockfd(0) {
     this->_commands.insert(std::pair<std::string, Command*>("CAP", new CAP));
     this->_commands.insert(std::pair<std::string, Command*>("NICK", new NICK));
     this->_commands.insert(std::pair<std::string, Command*>("PASS", new PASS));
+    this->_commands.insert(std::pair<std::string, Command*>("PING", new PING));
 };
 
 Server::~Server(void) {

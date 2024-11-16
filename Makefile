@@ -2,7 +2,7 @@ NAME 			= ircserv
 CC				= c++
 
 CLASSES_SRCS	= Channel.cpp Client.cpp Command.cpp Server.cpp
-COMMANDS_SRCS	= BOT.cpp CAP.cpp NICK.cpp PASS.cpp
+COMMANDS_SRCS	= BOT.cpp CAP.cpp NICK.cpp PASS.cpp PING.cpp
 UTILS_SRCS		= ft_convert.cpp ft_formatmessage.cpp ft_print.cpp ft_setsockopts.cpp RPN.cpp
 MAIN_SRCS		= ft_irc.cpp
 
@@ -14,7 +14,7 @@ OBJECTS			= $(SOURCES:.cpp=.o)
 OBJECTS_FOLDER  = $(addprefix objs/, $(OBJECTS))
 
 HEADERS_FILES	= Channel.hpp Client.hpp Command.hpp RPN.hpp Server.hpp utils.hpp
-CMD_HEADERS		= CAP.hpp NICK.hpp PASS.hpp
+CMD_HEADERS		= CAP.hpp NICK.hpp PASS.hpp PING.hpp
 
 HEADERS			= $(addprefix includes/commands/, $(CMD_HEADERS)) \
 				  $(addprefix includes/, $(HEADERS_FILES))

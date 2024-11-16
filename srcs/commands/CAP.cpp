@@ -6,7 +6,6 @@ CAP::~CAP(void) {};
 void CAP::run(Client* client, Channel* channel, std::vector<std::string> params) {	
     std::string cmd = params[0];
 
-    std::cout << cmd << std::endl;
     if (cmd == "REQ" || cmd == "DROP")
         return client->sendMessage("CAP * ACK :multi-prefix");
     else if (cmd == "LS" || cmd == "LIST")
