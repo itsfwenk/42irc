@@ -36,7 +36,7 @@ void BOT::run(Client* client, Channel* channel, std::vector<std::string> params)
         for (std::vector<std::string>::iterator it = params.begin(); it != params.end(); it++)
             say += *it + " ";
 
-        return client->sendMessage("[SAY] " + client->getNickname() + " says " + say);
+        return client->sendMessage("[SAY] " + client->getNickname() + " says: " + say);
     } else if (command == "HELP") {
         std::string selectedCommand;
 
