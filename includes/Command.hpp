@@ -24,7 +24,7 @@ class Command {
 		bool const& mustBeLogged(void);
 
 		// Run
-		virtual void run(Client& client, std::vector<std::string> params) = 0;
+		virtual void run(Client* client, std::vector<std::string> params) = 0;
 };
 
 # include "Client.hpp"

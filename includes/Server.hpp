@@ -19,6 +19,7 @@
 # include "utils.hpp"
 
 // Commands
+# include "NICK.hpp"
 # include "PASS.hpp"
 
 class Command;

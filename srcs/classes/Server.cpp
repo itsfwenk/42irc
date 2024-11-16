@@ -22,9 +22,8 @@ Server::Server(std::string port, std::string password): _sockfd(0), _password(pa
     signal(SIGTSTP, SIG_IGN);
 
     // Commands
-    PASS* passCMD = new PASS;
-
-    this->_commands.insert(std::pair<std::string, Command*>("PASS", passCMD));
+    this->_commands.insert(std::pair<std::string, Command*>("NICK", new NICK));
+    this->_commands.insert(std::pair<std::string, Command*>("PASS", new PASS));
 };
 
 Server::~Server(void) {
@@ -126,7 +125,7 @@ Client* Server::getClientByNickname(std::string nickname) {
         if (it->second->getNickname() == nickname && it->second->isLoggedIn())
             return it->second;
     };
-    throw std::invalid_argument("Cannot find any Client with this nickname.");
+    return NULL;
 };
 
 // Setters

@@ -42,6 +42,7 @@ void Client::parseMessageData(std::string messageData) {
 			this->execCommand(command);
 		} catch (std::exception &e) {
 			ft_print_warning(e.what());
+			this->sendMessage(ft_formatmessage(ERR_UNKNOWNCOMMAND, e.what(), this));
 		};
 
 		this->_messageData.erase(0, pos + 1);
@@ -104,7 +105,7 @@ void Client::execCommand(std::string command) {
 			throw std::invalid_argument("Command " + cmd + ": wrong number of argumets (expected " + oss.str() + ")");
 
 		ft_print_info(this->getNickname() + " is using " + selectedCommand->getName() + " command!");
-		selectedCommand->run(*this, params);
+		selectedCommand->run(this, params);
 	} else
 		throw std::invalid_argument("Cannot find " + cmd + " command.");
 };

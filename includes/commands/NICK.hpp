@@ -1,13 +1,13 @@
 #pragma once
-#ifndef PASS_HPP
-# define PASS_HPP
+#ifndef NICK_HPP
+# define NICK_HPP
 
 # include "Command.hpp"
 
-class PASS : public Command {
+class NICK : public Command {
 	public:
-		PASS(void);
-		virtual ~PASS(void);
+		NICK(void);
+		virtual ~NICK(void);
 
 		virtual void run(Client* client, std::vector<std::string> params);
 };
