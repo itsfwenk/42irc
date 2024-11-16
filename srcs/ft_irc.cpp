@@ -12,6 +12,7 @@ int main(int argc, char** argv) {
     std::string password = argv[2];
 
     try {
+        srand(static_cast<unsigned int>(time(NULL)));
         Server IRC_Server = Server(port, password);
         IRC_Server.launch();
         return IRC_Server.getExitStatus();

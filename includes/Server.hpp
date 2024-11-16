@@ -13,6 +13,7 @@
 # include <sstream>
 # include <map>
 # include <vector>
+# include <ctime>
 
 # include "Channel.hpp"
 # include "Client.hpp"
