@@ -27,6 +27,37 @@ bool const& Channel::isRestricted(void)
 	return this->_restricted;
 }
 
-std::string const& Channel::getName(void) {
+bool const& Channel::isInviteOnly(void)
+{
+	return this->_inviteOnly;
+}
+
+bool const& Channel::isTopicRestricted(void)
+{
+	return this->_topicRestricted;
+}
+
+std::string const& Channel::getPassword(void)
+{
+	return this->_password;
+}
+
+std::string const& Channel::getName(void)
+{
 	return this->_name;
-};
+}
+
+std::string const& Channel::getTopic(void)
+{
+	return this->_topic;
+}
+
+std::vector<Client	&>	Channel::getOperators(void)
+{
+	return this->_op;
+}
+
+std::vector<const int>	Channel::getClientIDs(void)
+{
+	return this->_clientsIDs;
+}
