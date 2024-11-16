@@ -137,5 +137,5 @@ void Client::sendMessage(std::string message) {
 	std::string formattedMessage = message + "\r\n";
 	std::ostringstream oss;
 	oss << this->getID();
-	send(this->getID(), formattedMessage.c_str(), formattedMessage.size(), 0);
+	send(this->getID(), formattedMessage.c_str(), formattedMessage.size(), MSG_NOSIGNAL);
 };
