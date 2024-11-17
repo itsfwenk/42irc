@@ -36,7 +36,7 @@ class Client {
 
 		// Commands
 		void execCommand(std::string command);
-		void sendMessage(std::string message);
+		void sendMessage(std::string message, Channel* channel);
 };
 
 # include "Server.hpp"

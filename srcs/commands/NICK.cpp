@@ -8,15 +8,15 @@ void NICK::run(Client* client, Channel* channel, std::vector<std::string> params
 	std::string nickname = params[0];
 
     if (!nickname.length()) {
-        return client->sendMessage(ft_formatmessage(ERR_NONICKNAMEGIVEN, "No nickname given.", client, channel));
+        return client->sendMessage(ft_formatmessage(ERR_NONICKNAMEGIVEN, "No nickname given.", client, channel), channel);
     };
 
 	try {
         client->setNickname(nickname);
     } catch (std::exception &err) {
         (void)err;
-        return client->sendMessage(ft_formatmessage(ERR_NICKNAMEINUSE, nickname, client, channel));
+        return client->sendMessage(ft_formatmessage(ERR_NICKNAMEINUSE, nickname, client, channel), channel);
     };
 
-    return client->sendMessage(":" + oldnickname + "!" + client->getUsername() + "@localhost NICK " + nickname);
+    return client->sendMessage(":" + oldnickname + "!" + client->getUsername() + "@localhost NICK " + nickname, channel);
 };

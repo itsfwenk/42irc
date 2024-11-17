@@ -116,7 +116,7 @@ void Client::execCommand(std::string command) {
 		};
 
 		if (warning.length()) {
-			this->sendMessage(ft_formatmessage(ERR_UNKNOWNCOMMAND, warning, this, selectedChannel));
+			this->sendMessage(ft_formatmessage(ERR_UNKNOWNCOMMAND, warning, this, selectedChannel), selectedChannel);
 			throw std::invalid_argument(warning);
 		};
 
@@ -128,12 +128,15 @@ void Client::execCommand(std::string command) {
 		selectedCommand->run(this, selectedChannel, params);
 	} else {
 		warning = "Cannot find " + cmd + " command.";
-		this->sendMessage(ft_formatmessage(ERR_UNKNOWNCOMMAND, warning, this, selectedChannel));
+		this->sendMessage(ft_formatmessage(ERR_UNKNOWNCOMMAND, warning, this, selectedChannel), selectedChannel);
 		ft_print_warning(warning);
 	};
 };
 
-void Client::sendMessage(std::string message) {
+void Client::sendMessage(std::string message, Channel* channel) {
+	(void)channel;
+	// if (channel)
+		// return channel->sendMessage(message);
 	std::string formattedMessage = message + "\r\n";
 	std::ostringstream oss;
 	oss << this->getID();

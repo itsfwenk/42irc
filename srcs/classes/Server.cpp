@@ -287,6 +287,6 @@ void Server::sendMessage(std::string message) {
     std::map<const int, Client*> clients = this->getClients();
     for (std::map<const int, Client*>::iterator it = clients.begin(); it != clients.end(); it++) {
         if (it->second)
-            it->second->sendMessage(message); 
+            it->second->sendMessage(message, NULL); 
     };
 };
