@@ -1,6 +1,6 @@
 #include "Channel.hpp"
 
-Channel::Channel()
+Channel::Channel(Server* server) : _id(std::time(NULL)), _server(server)
 {
 }
 
@@ -8,7 +8,7 @@ Channel::~Channel()
 {
 }
 
-int const& Channel::getID(void)
+time_t const& Channel::getID(void)
 {
 	return this->_id;
 };
@@ -53,7 +53,7 @@ std::string const& Channel::getTopic(void)
 	return this->_topic;
 }
 
-std::vector<Client	&>	Channel::getOperators(void)
+std::vector<const int>	Channel::getOperators(void)
 {
 	return this->_op;
 }
@@ -61,4 +61,51 @@ std::vector<Client	&>	Channel::getOperators(void)
 std::vector<const int>	Channel::getClientIDs(void)
 {
 	return this->_clientsIDs;
+}
+
+Server* Channel::getServer(void)
+{
+	return (this->_server);
+}
+
+bool Channel::isOperator(const int &clientID)
+{
+	std::vector<const int> operators = this->getOperators();
+	std::vector<const int>::iterator it = std::find(operators.begin(), operators.end(), clientID);
+
+	return (it != operators.end());
+}
+
+int Channel::countOperators()
+{
+	int i = 0;
+	for (std::vector<const int>::iterator it = getOperators().begin(); it != getOperators().end(); ++it)
+	{
+		i++;
+	}
+	return (i);
+}
+
+void Channel::cmd_kick(Client	&executor, Client	&target)
+{
+	if (Channel::isOperator(executor) == true
+		&& Channel::countOperators() > 0)
+	{
+
+	}
+}
+
+void Channel::cmd_invite(Client	&executor, Client	&target)
+{
+
+}
+
+void Channel::cmd_topic(Client	&executor, std::string topic)
+{
+
+}
+
+void Channel::cmd_mode(Client	&executor, std::string mode)
+{
+
 }

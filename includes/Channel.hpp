@@ -5,28 +5,34 @@
 # include <string>
 # include <signal.h>
 # include <vector>
+# include <exception>
+# include <ctime>
+# include <algorithm>
 
 # include "Client.hpp"
 
 class Channel {
 	private:
-		int _id;
-		int	_maxUsers;
-		bool	_userLimited;
-		bool	_restricted;
-		bool	_inviteOnly;
-		bool	_topicRestricted;
-		std::string		_password;
-		std::string		_name;
-		std::string		_topic;
-		std::vector<Client	&>	_op;
+		time_t					_id;
+		int						_maxUsers;
+		bool					_userLimited;
+		bool					_restricted;
+		bool					_inviteOnly;
+		bool					_topicRestricted;
+		std::string				_password;
+		std::string				_name;
+		std::string				_topic;
+		std::vector<const int>	_op;
 		std::vector<const int>	_clientsIDs;
+
+		Server*					_server;
+
 	public:
-		Channel();
+		Channel(Server* server);
 		~Channel();
 
 		//Accessors
-		int const& getID(void);
+		time_t const& getID(void);
 		int const& getMaxUser(void);
 		bool const& isUserLimited(void);
 		bool const& isRestricted(void);
@@ -35,15 +41,28 @@ class Channel {
 		std::string const& getPassword(void);
 		std::string const& getName(void);
 		std::string const& getTopic(void);
-		std::vector<Client	&>	getOperators(void);
+		std::vector<const int>	getOperators(void);
 		std::vector<const int>	getClientIDs(void);
+		Server* getServer(void);
 
+		bool isOperator(const int &clientID);
+		int countOperators();
 
 		//COMMAND
 		void cmd_kick(Client	&executor, Client	&target);
 		void cmd_invite(Client	&executor, Client	&target);
 		void cmd_topic(Client	&executor, std::string topic);
 		void cmd_mode(Client	&executor, std::string mode);
+
+		//EXCEPTIONS
+		class NotChannelOperator : public std::exception
+		{
+			public:
+			const char *what() const throw()
+			{
+				return "error : not operator";
+			}
+		};
 };
 
 #endif
