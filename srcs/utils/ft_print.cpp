@@ -18,6 +18,10 @@ void ft_print_message(std::string msg, std::string color) {
     std::cout << BOLD << color << msg << END_COLOR << '\n';
 };
 
+void ft_print_success(std::string success) {
+    ft_print_message("[SUCCESS]: " + success, GREEN);
+};
+
 void ft_print_info(std::string info) {
     ft_print_message("[INFO]: " + info, CYAN);
 };
