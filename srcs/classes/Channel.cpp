@@ -8,7 +8,8 @@ Channel::~Channel()
 {
 }
 
-int const& Channel::getID(void) {
+int const& Channel::getID(void)
+{
 	return this->_id;
 };
 
