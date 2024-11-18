@@ -103,17 +103,18 @@ void Client::execCommand(std::string command) {
 	if (selectedCommand) {
 		std::ostringstream oss;
 		oss << selectedCommand->getReqArgs();
+		std::string code = ERR_UNKNOWNCOMMAND;
 
-		if ((size_t)selectedCommand->getReqArgs() > params.size())
+		if ((size_t)selectedCommand->getReqArgs() > params.size()) {
 			warning = "Command " + cmd + ": wrong number of arguments (expected at least " + oss.str() + " argument(s))";
-		else if (selectedCommand->mustBeLogged() && !this->isLoggedIn())
+			code = ERR_NEEDMOREPARAMS;
+		} else if (selectedCommand->mustBeLogged() && !this->isLoggedIn()) {
 			warning = "You must be logged in to run this command!";
-		else if (selectedCommand->insideChannel() && !selectedChannel)
+		} else if (selectedCommand->insideChannel() && !selectedChannel) {
 			warning = "You must be inside a channel to run this command!";
-		else if (selectedCommand->isOpCMD()) {
-			// Vérifier si on est dans un salon valide.
-			// Vérifier si le client est un OP.
-		};
+			code = ERR_NOTONCHANNEL;
+		} else if (selectedCommand->isOpCMD() /*&& !selectedChannel->isOperator(this->getID())*/)
+			warning = "You must be an operator of this channel to run this command!";
 
 		if (warning.length()) {
 			this->sendMessage(ft_formatmessage(ERR_UNKNOWNCOMMAND, warning, this, selectedChannel), selectedChannel);
