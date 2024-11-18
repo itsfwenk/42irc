@@ -15,11 +15,8 @@ void KICK::run(Client *client, Channel *channel, std::vector<std::string> params
 
 	if (client->getNickname() == toKick->getNickname())
 		return client->sendMessage(ft_formatmessage(ERR_UNKNOWNCOMMAND, "Cannot self-kick", client), NULL);
-	else if (!fromChannel->isOperator(client->getID()))
-		return client->sendMessage(ft_formatmessage(ERR_CHANOPRIVSNEEDED, "You're not channel operator", client), NULL);
-	else if (!fromChannel->isInChannel(client->getID()))
-		return client->sendMessage(ft_formatmessage(ERR_USERNOTINCHANNEL, "User not in channel", client), NULL);
 
-	std::vector<const int> *channelClientIDs = fromChannel->getClientIDs();
-	channelClientIDs->erase(std::remove(channelClientIDs->begin(), channelClientIDs->end(), toKick->getID()), channelClientIDs->end());
+	std::vector<const int> channelClientIDs = fromChannel->getClientIDs();
+	channelClientIDs.erase(std::remove(channelClientIDs.begin(), channelClientIDs.end(), toKick->getID()), channelClientIDs.end());
+	client->sendMessage("Kick " + toKick->getNickname() + " from " +  fromChannel->getName(), fromChannel);
 }
