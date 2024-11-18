@@ -27,9 +27,9 @@ void ft_print_info(std::string info) {
 };
 
 void ft_print_warning(std::string warning) {
-    ft_print_message("[WARNING]: " + warning, YELLOW);
+    std::cerr << BOLD YELLOW << "[WARNING]: " << warning << END_COLOR << '\n';
 };
 
 void ft_print_error(std::string error) {
-    ft_print_message("[ERROR]: " + error, RED);
+    std::cerr << BOLD RED << "[ERROR]: " << error << END_COLOR << '\n';
 };
