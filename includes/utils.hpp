@@ -34,6 +34,7 @@
 # define ERR_NEEDMOREPARAMS     "461" // Paramètres insuffisants
 # define ERR_ALREADYREGISTERED  "462" // Déjà enregistré
 # define ERR_PASSWDMISMATCH     "464" // Mot de passe incorrect
+# define ERR_CHANNELISFULL      "471" // channel full
 # define ERR_CHANOPRIVSNEEDED   "482" // client attempted to perform an action that requires channel operator privileges
 # define ERR_NOOPERHOST         "491" // Aucun hôte d'opérateur disponible
 # define ERR_UMODEUNKNOWNFLAG   "501" // Mode utilisateur inconnu
