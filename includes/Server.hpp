@@ -24,6 +24,7 @@
 # include "NICK.hpp"
 # include "PASS.hpp"
 # include "PING.hpp"
+# include "USER.hpp"
 
 class Command;
 class Server {
