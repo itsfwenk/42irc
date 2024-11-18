@@ -105,7 +105,7 @@ void Client::execCommand(std::string command) {
 		oss << selectedCommand->getReqArgs();
 
 		if ((size_t)selectedCommand->getReqArgs() > params.size())
-			warning = "Command " + cmd + ": wrong number of argumets (expected at least " + oss.str() + " argument(s))";
+			warning = "Command " + cmd + ": wrong number of arguments (expected at least " + oss.str() + " argument(s))";
 		else if (selectedCommand->mustBeLogged() && !this->isLoggedIn())
 			warning = "You must be logged in to run this command!";
 		else if (selectedCommand->insideChannel() && !selectedChannel)

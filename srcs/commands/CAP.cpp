@@ -11,6 +11,6 @@ void CAP::run(Client* client, Channel* channel, std::vector<std::string> params)
     else if (cmd == "LS" || cmd == "LIST")
         return client->sendMessage("CAP * LS :multi-prefix sasl away-notify", channel);
     else if (cmd == "END")
-        return client->sendMessage("ENDED", channel);
+        return client->sendMessage("CAPENDED", channel);
     return client->sendMessage(ft_formatmessage(ERR_UNKNOWNCOMMAND, "Wrong parameter", client, channel), channel);
 };
