@@ -31,6 +31,7 @@ Server::Server(std::string port, std::string password): _sockfd(0) {
     this->_commands.insert(std::pair<std::string, Command*>("NICK", new NICK));
     this->_commands.insert(std::pair<std::string, Command*>("PASS", new PASS));
     this->_commands.insert(std::pair<std::string, Command*>("PING", new PING));
+    this->_commands.insert(std::pair<std::string, Command*>("USER", new USER));
 };
 
 Server::~Server(void) {
@@ -287,6 +288,6 @@ void Server::sendMessage(std::string message) {
     std::map<const int, Client*> clients = this->getClients();
     for (std::map<const int, Client*>::iterator it = clients.begin(); it != clients.end(); it++) {
         if (it->second)
-            it->second->sendMessage(message, NULL); 
+            it->second->sendMessage(message, NULL);
     };
 };
