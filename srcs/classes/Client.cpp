@@ -70,7 +70,7 @@ void Client::setLoggedIn(bool loggedIn) {
 void Client::execCommand(std::string command) {
 	Server* server = this->getServer();
 	std::istringstream iss(command);
-	
+
 	std::string prefix;
 	std::string cmd;
 	std::vector<std::string> params;
@@ -142,4 +142,15 @@ void Client::sendMessage(std::string message, Channel* channel) {
 	std::ostringstream oss;
 	oss << this->getID();
 	send(this->getID(), formattedMessage.c_str(), formattedMessage.size(), MSG_NOSIGNAL);
+};
+
+void Client::sendMessageToMyChannels(std::string message) {
+	int userId = this->getID();
+	Server* server = this->getServer();
+	std::map<const int, Channel*> channels = server->getChannels();
+
+	for (std::map<const int, Channel*>::iterator it = channels.begin(); it != channels.end(); it++) {
+		if (it->second->isInChannel(userId))
+			it->second->sendMessage(message);
+	}
 };
