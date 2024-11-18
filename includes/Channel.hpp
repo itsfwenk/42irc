@@ -10,6 +10,7 @@
 # include <algorithm>
 
 # include "Client.hpp"
+# include "utils.hpp"
 
 class Channel {
 	private:
@@ -41,18 +42,22 @@ class Channel {
 		std::string const& getPassword(void);
 		std::string const& getName(void);
 		std::string const& getTopic(void);
-		std::vector<const int>	getOperators(void);
-		std::vector<const int>	getClientIDs(void);
+		std::vector<const int>	*getOperators(void);
+		std::vector<const int>	*getClientIDs(void);
 		Server* getServer(void);
 
 		bool isOperator(const int &clientID);
 		int countOperators();
 
+		bool isInChannel(const int &clientID);
+
+		void sendMessage(std::string message, Client *sender);
+
 		//COMMAND
-		void cmd_kick(Client	&executor, Client	&target);
-		void cmd_invite(Client	&executor, Client	&target);
-		void cmd_topic(Client	&executor, std::string topic);
-		void cmd_mode(Client	&executor, std::string mode);
+		// void cmd_kick(Client	&executor, Client	&target);
+		// void cmd_invite(Client	&executor, Client	&target);
+		// void cmd_topic(Client	&executor, std::string topic);
+		// void cmd_mode(Client	&executor, std::string mode);
 
 		//EXCEPTIONS
 		class NotChannelOperator : public std::exception
