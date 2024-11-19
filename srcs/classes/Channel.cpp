@@ -111,3 +111,41 @@ void Channel::sendMessage(std::string message)
 			user->sendMessage(message, NULL);
 	}
 }
+
+void Channel::setInviteOnly(bool inviteOnly)
+{
+	this->_inviteOnly = inviteOnly;
+}
+
+void Channel::setTopicRestricted(bool topicRestricted)
+{
+	this->_topicRestricted = topicRestricted;
+}
+
+void Channel::setRestricted(bool restricted)
+{
+	this->_restricted = restricted;
+}
+
+void Channel::setPassword(std::string password)
+{
+	this->_password = password;
+}
+
+void Channel::OperatorPrivilege(bool grant, const int &clientID)
+{
+	if (grant)
+		this->_op.push_back(clientID);
+	else
+		this->_op.erase(std::remove(this->_op.begin(), this->_op.end(), clientID), this->_op.end());
+}
+
+void Channel::setUserLimited(bool userLimited)
+{
+	this->_userLimited = userLimited;
+}
+
+void Channel::setMaxUser(int maxUser)
+{
+	this->_maxUsers = maxUser;
+}

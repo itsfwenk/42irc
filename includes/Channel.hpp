@@ -58,6 +58,24 @@ class Channel {
 		// void cmd_invite(Client	&executor, Client	&target);
 		// void cmd_topic(Client	&executor, std::string topic);
 		// void cmd_mode(Client	&executor, std::string mode);
+
+		//Setters
+		//i Set/remove Invite-only channel
+		void setInviteOnly(bool inviteOnly);
+
+		//t Set/remove the restrictions of the TOPIC command to channel operators
+		void setTopicRestricted(bool topicRestricted);
+
+		//k Set/remove the channel key (password)
+		void setRestricted(bool restricted);
+		void setPassword(std::string password);
+
+		//o Give/take channel operator privilege
+		void OperatorPrivilege(bool grant, const int &clientID);
+
+		//l Set/remove the user limit to channel
+		void setUserLimited(bool userLimited);
+		void setMaxUser(int maxUser);
 };
 
 #endif

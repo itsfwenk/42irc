@@ -11,6 +11,10 @@ void KICK::run(Client *client, Channel *channel, std::vector<std::string> params
 	Channel	*fromChannel = server->getChannelByName(params[0]);
 	Client *toKick = server->getClientByNickname(params[1]);
 
+	if (!fromChannel)
+		return client->sendMessage(ft_formatmessage(ERR_NOSUCHCHANNEL, "No such channel", client), NULL);
+	if (!toKick)
+		return client->sendMessage(ft_formatmessage(ERR_NOSUCHNICK, "No such nick", client), NULL);
 	if (client->getNickname() == toKick->getNickname())
 		return client->sendMessage(ft_formatmessage(ERR_UNKNOWNCOMMAND, "Cannot self-kick", client), NULL);
 
