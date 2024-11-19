@@ -28,9 +28,13 @@ Server::Server(std::string port, std::string password): _sockfd(0) {
     // Commands
     this->_commands.insert(std::pair<std::string, Command*>("!bot", new BOT));
     this->_commands.insert(std::pair<std::string, Command*>("CAP", new CAP));
+    this->_commands.insert(std::pair<std::string, Command*>("INVITE", new INVITE));
+    this->_commands.insert(std::pair<std::string, Command*>("KICK", new KICK));
+    this->_commands.insert(std::pair<std::string, Command*>("MODE", new MODE));
     this->_commands.insert(std::pair<std::string, Command*>("NICK", new NICK));
     this->_commands.insert(std::pair<std::string, Command*>("PASS", new PASS));
     this->_commands.insert(std::pair<std::string, Command*>("PING", new PING));
+    this->_commands.insert(std::pair<std::string, Command*>("TOPIC", new TOPIC));
     this->_commands.insert(std::pair<std::string, Command*>("USER", new USER));
 };
 
@@ -105,13 +109,18 @@ void Server::rmChannel(int channelId) {
 };
 
 void Server::rmClient(int clientId) {
-    std::map<const int, Client*>& clients = this->getClients();
-    Client* clientExists = this->getClientByID(clientId);
-    if (clientExists) {
-        close(clientId);
-        delete clientExists;
-        clients.erase(clientId);
-    };
+	std::map<const int, Client*>& clients = this->getClients();
+	Client* clientExists = this->getClientByID(clientId);
+	if (clientExists) {
+		std::map<const int, Channel*> channels = this->getChannels();
+		for (std::map<const int, Channel*>::iterator it = channels.begin(); it != channels.end(); it++) {
+			if (it->second->isInChannel(clientExists->getID()))
+				it->second->rmClient(clientExists->getID());
+		};
+		close(clientId);
+		delete clientExists;
+		clients.erase(clientId);
+	};
 };
 
 Channel* Server::getChannelByID(int channelId) {

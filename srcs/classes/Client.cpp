@@ -113,7 +113,7 @@ void Client::execCommand(std::string command) {
 		} else if (selectedCommand->insideChannel() && !selectedChannel) {
 			warning = "You must be inside a channel to run this command!";
 			code = ERR_NOTONCHANNEL;
-		} else if (selectedCommand->isOpCMD() /*&& !selectedChannel->isOperator(this->getID())*/)
+		} else if (selectedCommand->isOpCMD() && !selectedChannel->isOperator(this->getID()))
 			warning = "You must be an operator of this channel to run this command!";
 
 		if (warning.length()) {
@@ -135,9 +135,8 @@ void Client::execCommand(std::string command) {
 };
 
 void Client::sendMessage(std::string message, Channel* channel) {
-	(void)channel;
-	// if (channel)
-		// return channel->sendMessage(message);
+	if (channel)
+		return channel->sendMessage(message);
 	std::string formattedMessage = message + "\r\n";
 	std::ostringstream oss;
 	oss << this->getID();
