@@ -28,9 +28,13 @@ Server::Server(std::string port, std::string password): _sockfd(0) {
     // Commands
     this->_commands.insert(std::pair<std::string, Command*>("!bot", new BOT));
     this->_commands.insert(std::pair<std::string, Command*>("CAP", new CAP));
+    this->_commands.insert(std::pair<std::string, Command*>("INVITE", new INVITE));
+    this->_commands.insert(std::pair<std::string, Command*>("KICK", new KICK));
+    this->_commands.insert(std::pair<std::string, Command*>("MODE", new MODE));
     this->_commands.insert(std::pair<std::string, Command*>("NICK", new NICK));
     this->_commands.insert(std::pair<std::string, Command*>("PASS", new PASS));
     this->_commands.insert(std::pair<std::string, Command*>("PING", new PING));
+    this->_commands.insert(std::pair<std::string, Command*>("TOPIC", new TOPIC));
     this->_commands.insert(std::pair<std::string, Command*>("USER", new USER));
 };
 

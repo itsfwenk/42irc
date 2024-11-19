@@ -21,9 +21,13 @@
 // Commands
 # include "BOT.hpp"
 # include "CAP.hpp"
+# include "INVITE.hpp"
+# include "KICK.hpp"
+# include "MODE.hpp"
 # include "NICK.hpp"
 # include "PASS.hpp"
 # include "PING.hpp"
+# include "TOPIC.hpp"
 # include "USER.hpp"
 
 class Command;
