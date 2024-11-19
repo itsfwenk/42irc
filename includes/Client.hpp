@@ -4,6 +4,7 @@
 
 # include <sstream>
 # include <ctime>
+# include <map>
 # include "utils.hpp"
 
 class Server;
@@ -27,7 +28,8 @@ class Client {
 		time_t const& getAcceptedAt(void);
 		bool const& isLoggedIn(void);
 		Server* getServer(void);
-		std::map<const int, Channel*> getJoinedChannelsMap();
+		std::map<int, Channel*> getJoinedChannelsMap(void);
+		std::string getJoinedChannelsNames(void);
 
 		// Setters
 		void parseMessageData(std::string messageData);

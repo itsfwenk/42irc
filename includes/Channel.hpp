@@ -23,8 +23,8 @@ class Channel {
 		std::string				_password;
 		std::string				_name;
 		std::string				_topic;
-		std::vector<const int>	_op;
-		std::vector<const int>	_clientsIDs;
+		std::vector<int>	_op;
+		std::vector<int>	_clientsIDs;
 
 		Server*					_server;
 
@@ -42,18 +42,18 @@ class Channel {
 		std::string const& getPassword(void);
 		std::string const& getName(void);
 		std::string const& getTopic(void);
-		std::vector<const int>	&getOperators(void);
-		std::vector<const int>	&getClientIDs(void);
+		std::vector<int>	&getOperators(void);
+		std::vector<int>	&getClientIDs(void);
 		Server* getServer(void);
 
-		bool isOperator(const int &clientID);
+		bool isOperator(int clientID);
 		int countOperators();
 
-		bool isInChannel(const int &clientID);
+		bool isInChannel(int clientID);
 
 		void sendMessage(std::string message);
 
-		void rmClient(const int &clientID);
+		void rmClient(int clientID);
 
 		//COMMAND
 		// void cmd_kick(Client	&executor, Client	&target);
@@ -73,7 +73,7 @@ class Channel {
 		void setPassword(std::string password);
 
 		//o Give/take channel operator privilege
-		void OperatorPrivilege(bool grant, const int &clientID);
+		void OperatorPrivilege(bool grant, int &clientID);
 
 		//l Set/remove the user limit to channel
 		void setUserLimited(bool userLimited);

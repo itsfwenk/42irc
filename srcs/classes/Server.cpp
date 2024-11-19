@@ -29,24 +29,28 @@ Server::Server(std::string port, std::string password): _sockfd(0) {
     this->_commands.insert(std::pair<std::string, Command*>("!bot", new BOT));
     this->_commands.insert(std::pair<std::string, Command*>("CAP", new CAP));
     this->_commands.insert(std::pair<std::string, Command*>("INVITE", new INVITE));
+    this->_commands.insert(std::pair<std::string, Command*>("JOIN", new JOIN));
     this->_commands.insert(std::pair<std::string, Command*>("KICK", new KICK));
     this->_commands.insert(std::pair<std::string, Command*>("MODE", new MODE));
     this->_commands.insert(std::pair<std::string, Command*>("NICK", new NICK));
     this->_commands.insert(std::pair<std::string, Command*>("PASS", new PASS));
     this->_commands.insert(std::pair<std::string, Command*>("PING", new PING));
+    this->_commands.insert(std::pair<std::string, Command*>("PRIVMSG", new PRIVMSG));
+    this->_commands.insert(std::pair<std::string, Command*>("QUIT", new QUIT));
     this->_commands.insert(std::pair<std::string, Command*>("TOPIC", new TOPIC));
     this->_commands.insert(std::pair<std::string, Command*>("USER", new USER));
+    this->_commands.insert(std::pair<std::string, Command*>("WHOIS", new WHOIS));
 };
 
 Server::~Server(void) {
-    std::map<const int, Channel*> channels = this->getChannels();
-    for (std::map<const int, Channel*>::iterator it = channels.begin(); it != channels.end(); it++) {
+    std::map<int, Channel*> channels = this->getChannels();
+    for (std::map<int, Channel*>::iterator it = channels.begin(); it != channels.end(); it++) {
         if (it->second)
             delete it->second;
     };
 
-    std::map<const int, Client*>& clients = this->getClients();
-    for (std::map<const int, Client*>::iterator it = clients.begin(); it != clients.end(); it++) {
+    std::map<int, Client*>& clients = this->getClients();
+    for (std::map<int, Client*>::iterator it = clients.begin(); it != clients.end(); it++) {
         if (it->second)
             delete it->second;
     };
@@ -80,27 +84,27 @@ int const& Server::getExitStatus(void) {
 };
 
 void Server::addChannel(Channel* channel) {
-    std::map<const int, Channel*>& channels = this->getChannels();
+    std::map<int, Channel*>& channels = this->getChannels();
     Channel* channelExists = this->getChannelByID(channel->getID());
     if (channelExists) {
         delete channelExists;
         throw std::runtime_error("This channel is already on the list.");
     };
-    channels.insert(std::pair<const int, Channel*>(channel->getID(), channel));
+    channels.insert(std::pair<int, Channel*>(channel->getID(), channel));
 };
 
 void Server::addClient(Client* client) {
-    std::map<const int, Client*>& clients = this->getClients();
+    std::map<int, Client*>& clients = this->getClients();
     Client* clientExists = this->getClientByID(client->getID());
     if (clientExists) {
         delete client;
         throw std::runtime_error("This client is already on the list.");
     };
-    clients.insert(std::pair<const int, Client*>(client->getID(), client));
+    clients.insert(std::pair<int, Client*>(client->getID(), client));
 };
 
 void Server::rmChannel(int channelId) {
-    std::map<const int, Channel*>& channels = this->getChannels();
+    std::map<int, Channel*>& channels = this->getChannels();
     Channel* channelExists = this->getChannelByID(channelId);
     if (channelExists) {
         delete channelExists;
@@ -109,11 +113,11 @@ void Server::rmChannel(int channelId) {
 };
 
 void Server::rmClient(int clientId) {
-	std::map<const int, Client*>& clients = this->getClients();
+	std::map<int, Client*>& clients = this->getClients();
 	Client* clientExists = this->getClientByID(clientId);
 	if (clientExists) {
-		std::map<const int, Channel*> channels = this->getChannels();
-		for (std::map<const int, Channel*>::iterator it = channels.begin(); it != channels.end(); it++) {
+		std::map<int, Channel*> channels = this->getChannels();
+		for (std::map<int, Channel*>::iterator it = channels.begin(); it != channels.end(); it++) {
 			if (it->second->isInChannel(clientExists->getID()))
 				it->second->rmClient(clientExists->getID());
 		};
@@ -124,16 +128,16 @@ void Server::rmClient(int clientId) {
 };
 
 Channel* Server::getChannelByID(int channelId) {
-    std::map<const int, Channel*> channels = this->getChannels();
-    std::map<const int, Channel*>::iterator it = channels.find(channelId);
+    std::map<int, Channel*> channels = this->getChannels();
+    std::map<int, Channel*>::iterator it = channels.find(channelId);
     if (it == channels.end())
         return NULL;
     return it->second;
 };
 
 Client* Server::getClientByID(int clientId) {
-    std::map<const int, Client*> clients = this->getClients();
-    std::map<const int, Client*>::iterator it = clients.find(clientId);
+    std::map<int, Client*> clients = this->getClients();
+    std::map<int, Client*>::iterator it = clients.find(clientId);
     if (it == clients.end())
         return NULL;
     return it->second;
@@ -148,8 +152,8 @@ Command* Server::getCommandByName(std::string name) {
 };
 
 Client* Server::getClientByNickname(std::string nickname) {
-    std::map<const int, Client*> clients = this->getClients();
-    for (std::map<const int, Client*>::iterator it = clients.begin(); it != clients.end(); it++) {
+    std::map<int, Client*> clients = this->getClients();
+    for (std::map<int, Client*>::iterator it = clients.begin(); it != clients.end(); it++) {
         if (it->second->getNickname() == nickname && it->second->isLoggedIn())
             return it->second;
     };
@@ -157,19 +161,19 @@ Client* Server::getClientByNickname(std::string nickname) {
 };
 
 Channel* Server::getChannelByName(std::string name) {
-    std::map<const int, Channel*> channels = this->getChannels();
-    for (std::map<const int, Channel*>::iterator it = channels.begin(); it != channels.end(); it++) {
+    std::map<int, Channel*> channels = this->getChannels();
+    for (std::map<int, Channel*>::iterator it = channels.begin(); it != channels.end(); it++) {
         if (it->second->getName() == name)
             return it->second;
     };
     return NULL;
 };
 
-std::map<const int, Channel*>& Server::getChannels(void) {
+std::map<int, Channel*>& Server::getChannels(void) {
     return this->_channels;
 };
 
-std::map<const int, Client*>& Server::getClients(void) {
+std::map<int, Client*>& Server::getClients(void) {
     return this->_clients;
 };
 
@@ -294,8 +298,8 @@ void Server::launch(void) {
 };
 
 void Server::sendMessage(std::string message) {
-    std::map<const int, Client*> clients = this->getClients();
-    for (std::map<const int, Client*>::iterator it = clients.begin(); it != clients.end(); it++) {
+    std::map<int, Client*> clients = this->getClients();
+    for (std::map<int, Client*>::iterator it = clients.begin(); it != clients.end(); it++) {
         if (it->second)
             it->second->sendMessage(message, NULL);
     };

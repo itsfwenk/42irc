@@ -6,7 +6,7 @@ MODE::~MODE(void) {};
 void MODE::run(Client *client, Channel *channel, std::vector<std::string> params)
 {
 	(void)channel;
-	int param_count = 2;
+	size_t param_count = 2;
 	int clientID;
 	Client *targetClient;
 
@@ -18,7 +18,7 @@ void MODE::run(Client *client, Channel *channel, std::vector<std::string> params
 		return client->sendMessage(ft_formatmessage(ERR_NOSUCHCHANNEL, "No such channel", client), NULL);
 	if (mode[0] == '+')
 	{
-		for (int i = 0; i < mode.length(); i++)
+		for (size_t i = 0; i < mode.length(); i++)
 		{
 			if (mode[i] == 'i')
 				targetChannel->setInviteOnly(true);
@@ -58,7 +58,7 @@ void MODE::run(Client *client, Channel *channel, std::vector<std::string> params
 	}
 	else if (mode[0] == '-')
 	{
-		for (int i = 0; i < mode.length(); i++)
+		for (size_t i = 0; i < mode.length(); i++)
 		{
 			if (mode[i] == 'i')
 				targetChannel->setInviteOnly(false);

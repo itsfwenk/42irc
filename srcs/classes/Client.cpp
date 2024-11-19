@@ -68,6 +68,7 @@ void Client::setLoggedIn(bool loggedIn) {
 
 // Commands
 void Client::execCommand(std::string command) {
+	std::cout << command << std::endl;
 	Server* server = this->getServer();
 	std::istringstream iss(command);
 
@@ -104,13 +105,13 @@ void Client::execCommand(std::string command) {
 		std::ostringstream oss;
 		oss << selectedCommand->getReqArgs();
 		std::string code = ERR_UNKNOWNCOMMAND;
-
+		std::cout << selectedCommand->getName() << "\n" << (params.size() > 1 ? params[1] : "");
 		if ((size_t)selectedCommand->getReqArgs() > params.size()) {
 			warning = "Command " + cmd + ": wrong number of arguments (expected at least " + oss.str() + " argument(s))";
 			code = ERR_NEEDMOREPARAMS;
 		} else if (selectedCommand->mustBeLogged() && !this->isLoggedIn()) {
 			warning = "You must be logged in to run this command!";
-		} else if (selectedCommand->insideChannel() && !selectedChannel) {
+		} else if ((selectedCommand->insideChannel() || selectedCommand->isOpCMD()) && !selectedChannel) {
 			warning = "You must be inside a channel to run this command!";
 			code = ERR_NOTONCHANNEL;
 		} else if (selectedCommand->isOpCMD() && !selectedChannel->isOperator(this->getID()))
@@ -144,21 +145,29 @@ void Client::sendMessage(std::string message, Channel* channel) {
 };
 
 void Client::sendMessageToMyChannels(std::string message) {
-	std::map<const int, Channel*> channels = this->getJoinedChannelsMap();
+	std::map<int, Channel*> channels = this->getJoinedChannelsMap();
 
-	for (std::map<const int, Channel*>::iterator it = channels.begin(); it != channels.end(); it++)
+	for (std::map<int, Channel*>::iterator it = channels.begin(); it != channels.end(); it++)
 			it->second->sendMessage(message);
 };
 
-std::map<const int, Channel*> Client::getJoinedChannelsMap() {
-	std::map<const int, Channel*> joinedChannels;
+std::map<int, Channel*> Client::getJoinedChannelsMap(void) {
+	std::map<int, Channel*> joinedChannels;
 	int userId = this->getID();
 	Server* server = this->getServer();
-	std::map<const int, Channel*> allChannels = server->getChannels();
+	std::map<int, Channel*> allChannels = server->getChannels();
 
-	for (std::map<const int, Channel*>::iterator it = allChannels.begin(); it != allChannels.end(); ++it)
+	for (std::map<int, Channel*>::iterator it = allChannels.begin(); it != allChannels.end(); ++it)
 		if (it->second->isInChannel(userId))
-			joinedChannels[it->first] = it->second;
+			joinedChannels.insert(*it);
 
 	return (joinedChannels);
+};
+
+std::string Client::getJoinedChannelsNames(void) {
+	std::string names = "";
+	std::map<int, Channel*> joinedChannels = this->getJoinedChannelsMap();
+	for (std::map<int, Channel*>::iterator it = joinedChannels.begin(); it != joinedChannels.end(); it++)
+		names += it->second->getName() + " ";
+	return names;
 };

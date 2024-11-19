@@ -1,19 +1,17 @@
 #include "PRIVMSG.hpp"
 
-PRIVMSG::PRIVMSG(void) : Command("PRIVMSG", 2, true, true, false) {};
+PRIVMSG::PRIVMSG(void) : Command("PRIVMSG", 0, false, false, false) {};
 PRIVMSG::~PRIVMSG(void) {};
 
-void PRIVMSG::run(Client *client, Channel *channel, std::vector<std::string> params)
+void PRIVMSG::run(Client *client, Channel *toChannel, std::vector<std::string> params)
 {
-	(void)channel;
-
 	Server *server = client->getServer();
-	Channel	*toChannel;
 	Client *toClient;
 
+	if (!params.size())
+		return;
 	if (params[0][0] == '#')
 	{
-		toChannel = server->getChannelByName(params[0]);
 		if (!toChannel)
 			return client->sendMessage(ft_formatmessage(ERR_NOSUCHCHANNEL, "No such channel", client), NULL);
 		if (!toChannel->isInChannel(client->getID()))

@@ -22,13 +22,17 @@
 # include "BOT.hpp"
 # include "CAP.hpp"
 # include "INVITE.hpp"
+# include "JOIN.hpp"
 # include "KICK.hpp"
 # include "MODE.hpp"
 # include "NICK.hpp"
 # include "PASS.hpp"
 # include "PING.hpp"
+# include "PRIVMSG.hpp"
+# include "QUIT.hpp"
 # include "TOPIC.hpp"
 # include "USER.hpp"
+# include "WHOIS.hpp"
 
 class Command;
 class Server {
@@ -39,8 +43,8 @@ class Server {
         static bool                     _running;
         static int                      _exitStatus;
 
-        std::map<const int, Channel*>   _channels;
-        std::map<const int, Client*>    _clients;
+        std::map<int, Channel*>   _channels;
+        std::map<int, Client*>    _clients;
         std::map<std::string, Command*> _commands;
 
     public:
@@ -60,8 +64,8 @@ class Server {
         bool const& isRunning(void);
         int const& getExitStatus(void);
 
-        std::map<const int, Channel*>& getChannels(void);
-        std::map<const int, Client*>& getClients(void);
+        std::map<int, Channel*>& getChannels(void);
+        std::map<int, Client*>& getClients(void);
         std::map<std::string, Command*>& getCommands(void);
 
         Channel* getChannelByID(int channelId);

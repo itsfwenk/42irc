@@ -17,7 +17,7 @@ void INVITE::run(Client *client, Channel *channel, std::vector<std::string> para
 		return client->sendMessage(ft_formatmessage(ERR_NOSUCHCHANNEL, "No such channel", client), NULL);
 	if (toChannel->isUserLimited())
 	{
-		if (toChannel->getClientIDs().size() == toChannel->getMaxUser())
+		if (toChannel->getClientIDs().size() == (size_t)toChannel->getMaxUser())
 			return client->sendMessage(ft_formatmessage(ERR_CHANNELISFULL, toChannel->getName() + " is full", client), NULL);
 	}
 	toChannel->getClientIDs().push_back(toInvite->getID());

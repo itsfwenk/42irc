@@ -17,6 +17,11 @@ void JOIN::run(Client* client, Channel* channel, std::vector<std::string> params
 	if (!targetChannel)
 	{
 		targetChannel = new Channel(channelName, server);
+		targetChannel->setMaxUser(-1);
+		targetChannel->setRestricted(false);
+		targetChannel->setInviteOnly(false);
+		targetChannel->setTopicRestricted(false);
+		targetChannel->setUserLimited(false);
 		server->addChannel(targetChannel);
 	}
 	//isInChannel
@@ -30,7 +35,7 @@ void JOIN::run(Client* client, Channel* channel, std::vector<std::string> params
 		return;
 	}
 	//isUserLimited
-	if (targetChannel->isUserLimited() && targetChannel->getClientIDs().size() >= targetChannel->getMaxUser()) {
+	if (targetChannel->isUserLimited() && targetChannel->getClientIDs().size() >= (size_t)targetChannel->getMaxUser()) {
 		client->sendMessage(": @localhost NOTICE " + client->getNickname() + " :Cannot join channel " + channelName + " (Channel is full)", channel);
 		return;
 	}

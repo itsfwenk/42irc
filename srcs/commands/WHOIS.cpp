@@ -21,7 +21,7 @@ void WHOIS::run(Client* client, Channel* channel, std::vector<std::string> param
 	client->sendMessage(": @localhost 311 " + client->getNickname() + " " + target->getNickname() + " " + target->getUsername() + " * :", channel);
 
 	// Contains the names of all channels the user has joined.
-	client->sendMessage(": @localhost 319 " + client->getNickname() + " " + target->getNickname() + " :" + target->getJoinedChannelNames(), channel);
+	client->sendMessage(": @localhost 319 " + client->getNickname() + " " + target->getNickname() + " :" + target->getJoinedChannelsNames(), channel);
 
 	// Contains the name of the server the user is connected to and its description.
 	client->sendMessage(": @localhost 312 " + client->getNickname() + " " + target->getNickname() + " @localhost :Server Info", channel);

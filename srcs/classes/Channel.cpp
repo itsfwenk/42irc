@@ -53,12 +53,12 @@ std::string const& Channel::getTopic(void)
 	return this->_topic;
 }
 
-std::vector<const int>	&Channel::getOperators(void)
+std::vector<int>	&Channel::getOperators(void)
 {
 	return this->_op;
 }
 
-std::vector<const int>	&Channel::getClientIDs(void)
+std::vector<int>	&Channel::getClientIDs(void)
 {
 	return this->_clientsIDs;
 }
@@ -68,24 +68,24 @@ Server* Channel::getServer(void)
 	return (this->_server);
 }
 
-bool Channel::isOperator(const int &clientID)
+bool Channel::isOperator(int clientID)
 {
-	std::vector<const int> operators = this->getOperators();
-	std::vector<const int>::iterator it = std::find(operators.begin(), operators.end(), clientID);
+	std::vector<int> operators = this->getOperators();
+	std::vector<int>::iterator it = std::find(operators.begin(), operators.end(), clientID);
 
 	return (it != operators.end());
 }
 
 int Channel::countOperators()
 {
-	std::vector<const int> op = this->getOperators();
+	std::vector<int> op = this->getOperators();
 	return (op.size());
 }
 
-bool Channel::isInChannel(const int &clientID)
+bool Channel::isInChannel(int clientID)
 {
-	std::vector<const int> channelClients = this->getClientIDs();
-	std::vector<const int>::iterator it = std::find(channelClients.begin(), channelClients.end(), clientID);
+	std::vector<int> channelClients = this->getClientIDs();
+	std::vector<int>::iterator it = std::find(channelClients.begin(), channelClients.end(), clientID);
 
 	return (it != channelClients.end());
 }
@@ -101,12 +101,12 @@ bool Channel::isInChannel(const int &clientID)
 void Channel::sendMessage(std::string message)
 {
 	Server* server = this->getServer();
-	std::map<const int, Client*>	clients = server->getClients();
-	std::vector<const int> channelClientIDs = this->getClientIDs();
+	std::map<int, Client*>	clients = server->getClients();
+	std::vector<int> channelClientIDs = this->getClientIDs();
 
-	for (std::vector<const int>::iterator it = channelClientIDs.begin(); it != channelClientIDs.end(); it++)
+	for (std::vector<int>::iterator it = channelClientIDs.begin(); it != channelClientIDs.end(); it++)
 	{
-		Client *user = server->getClientByID(it->first);
+		Client *user = server->getClientByID(*it);
 		if (user)
 			user->sendMessage(message, NULL);
 	}
@@ -132,7 +132,7 @@ void Channel::setPassword(std::string password)
 	this->_password = password;
 }
 
-void Channel::OperatorPrivilege(bool grant, const int &clientID)
+void Channel::OperatorPrivilege(bool grant, int &clientID)
 {
 	if (grant)
 		this->_op.push_back(clientID);
@@ -150,8 +150,11 @@ void Channel::setMaxUser(int maxUser)
 	this->_maxUsers = maxUser;
 }
 
-void Channel::rmClient(const int &clientID)
+void Channel::rmClient(int clientID)
 {
-	std::vector<const int> &channelClientIDs = this->_clientsIDs;
-	channelClientIDs.erase(std::remove(channelClientIDs.begin(), channelClientIDs.end(), clientID), channelClientIDs.end());
+	std::vector<int> &channelClientIDs = this->_clientsIDs;
+	std::vector<int>::iterator it = std::find(channelClientIDs.begin(), channelClientIDs.end(), clientID);
+
+	if (it != channelClientIDs.end())
+		channelClientIDs.erase(it);
 }
