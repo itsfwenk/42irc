@@ -8,7 +8,7 @@ void KICK::run(Client *client, Channel *channel, std::vector<std::string> params
 	(void)channel;
 
 	Server *server = client->getServer();
-	Channel	*fromChannel = channel;
+	Channel	*fromChannel = server->getChannelByName(params[0]);
 	Client *toKick = server->getClientByNickname(params[1]);
 
 	if (!fromChannel)

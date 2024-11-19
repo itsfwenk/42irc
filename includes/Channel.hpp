@@ -29,7 +29,7 @@ class Channel {
 		Server*					_server;
 
 	public:
-		Channel(Server* server);
+		Channel(std::string name, Server* server);
 		~Channel();
 
 		//Accessors
@@ -81,3 +81,4 @@ class Channel {
 };
 
 #endif
+

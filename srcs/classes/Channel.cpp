@@ -1,6 +1,6 @@
 #include "Channel.hpp"
 
-Channel::Channel(Server* server) : _id(std::time(NULL)), _server(server)
+Channel::Channel(std::string name, Server* server) : _id(std::time(NULL)), _name(name), _server(server)
 {
 }
 
