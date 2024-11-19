@@ -53,6 +53,8 @@ class Channel {
 
 		void sendMessage(std::string message);
 
+		void rmClient(const int &clientID);
+
 		//COMMAND
 		// void cmd_kick(Client	&executor, Client	&target);
 		// void cmd_invite(Client	&executor, Client	&target);

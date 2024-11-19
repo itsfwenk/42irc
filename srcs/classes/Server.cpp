@@ -105,13 +105,18 @@ void Server::rmChannel(int channelId) {
 };
 
 void Server::rmClient(int clientId) {
-    std::map<const int, Client*>& clients = this->getClients();
-    Client* clientExists = this->getClientByID(clientId);
-    if (clientExists) {
-        close(clientId);
-        delete clientExists;
-        clients.erase(clientId);
-    };
+	std::map<const int, Client*>& clients = this->getClients();
+	Client* clientExists = this->getClientByID(clientId);
+	if (clientExists) {
+		std::map<const int, Channel*> channels = this->getChannels();
+		for (std::map<const int, Channel*>::iterator it = channels.begin(); it != channels.end(); it++) {
+			if (it->second->isInChannel(clientExists->getID()))
+				it->second->rmClient(clientExists->getID());
+		};
+		close(clientId);
+		delete clientExists;
+		clients.erase(clientId);
+	};
 };
 
 Channel* Server::getChannelByID(int channelId) {

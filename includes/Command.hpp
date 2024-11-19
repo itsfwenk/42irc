@@ -3,6 +3,7 @@
 # define COMMAND_HPP
 
 # include <vector>
+# include <limits>
 # include "utils.hpp"
 
 class Channel;

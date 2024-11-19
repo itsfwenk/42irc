@@ -149,3 +149,9 @@ void Channel::setMaxUser(int maxUser)
 {
 	this->_maxUsers = maxUser;
 }
+
+void Channel::rmClient(const int &clientID)
+{
+	std::vector<const int> &channelClientIDs = this->_clientsIDs;
+	channelClientIDs.erase(std::remove(channelClientIDs.begin(), channelClientIDs.end(), clientID), channelClientIDs.end());
+}

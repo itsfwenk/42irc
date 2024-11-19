@@ -135,7 +135,6 @@ void Client::execCommand(std::string command) {
 };
 
 void Client::sendMessage(std::string message, Channel* channel) {
-	(void)channel;
 	if (channel)
 		return channel->sendMessage(message);
 	std::string formattedMessage = message + "\r\n";

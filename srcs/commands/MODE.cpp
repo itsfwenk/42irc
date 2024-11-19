@@ -8,6 +8,7 @@ void MODE::run(Client *client, Channel *channel, std::vector<std::string> params
 	(void)channel;
 	int param_count = 2;
 	int clientID;
+	Client *targetClient;
 
 	Server	*server = client->getServer();
 	Channel	*targetChannel = server->getChannelByName(params[0]);
@@ -21,9 +22,9 @@ void MODE::run(Client *client, Channel *channel, std::vector<std::string> params
 		{
 			if (mode[i] == 'i')
 				targetChannel->setInviteOnly(true);
-			if (mode[i] == 't')
+			else if (mode[i] == 't')
 				targetChannel->setTopicRestricted(true);
-			if (mode[i] == 'k')
+			else if (mode[i] == 'k')
 			{
 				if (params.size() < param_count + 1)
 					return client->sendMessage(ft_formatmessage(ERR_NEEDMOREPARAMS, "Not enough parameters", client), NULL);
@@ -31,17 +32,18 @@ void MODE::run(Client *client, Channel *channel, std::vector<std::string> params
 				targetChannel->setRestricted(true);
 				param_count++;
 			}
-			if (mode[i] == 'o')
+			else if (mode[i] == 'o')
 			{
 				if (params.size() < param_count + 1)
 					return client->sendMessage(ft_formatmessage(ERR_NEEDMOREPARAMS, "Not enough parameters", client), NULL);
-				clientID = server->getClientByNickname(params[param_count])->getID();
-				if (clientID == -1)
+				targetClient = server->getClientByNickname(params[param_count]);
+				if (targetClient == NULL)
 					return client->sendMessage(ft_formatmessage(ERR_NOSUCHNICK, "No such nick", client), NULL);
+				clientID = targetChannel->getID();
 				targetChannel->OperatorPrivilege(true, clientID);
 				param_count++;
 			}
-			if (mode[i] == 'l')
+			else if (mode[i] == 'l')
 			{
 				if (params.size() < param_count + 1)
 					return client->sendMessage(ft_formatmessage(ERR_NEEDMOREPARAMS, "Not enough parameters", client), NULL);
@@ -58,26 +60,27 @@ void MODE::run(Client *client, Channel *channel, std::vector<std::string> params
 	{
 		for (int i = 0; i < mode.length(); i++)
 		{
-			if (mode.find("i") != std::string::npos)
+			if (mode[i] == 'i')
 				targetChannel->setInviteOnly(false);
-			if (mode.find("t") != std::string::npos)
+			else if (mode[i] == 't')
 				targetChannel->setTopicRestricted(false);
-			if (mode.find("k") != std::string::npos)
+			else if (mode[i] == 'k')
 			{
 				targetChannel->setPassword("");
 				targetChannel->setRestricted(false);
 			}
-			if (mode.find("o") != std::string::npos)
+			else if (mode[i] == 'o')
 			{
 				if (params.size() < param_count + 1)
 					return client->sendMessage(ft_formatmessage(ERR_NEEDMOREPARAMS, "Not enough parameters", client), NULL);
-				clientID = server->getClientByNickname(params[param_count])->getID();
-				if (clientID == -1)
+				targetClient = server->getClientByNickname(params[param_count]);
+				if (targetClient == NULL)
 					return client->sendMessage(ft_formatmessage(ERR_NOSUCHNICK, "No such nick", client), NULL);
+				clientID = targetClient->getID();
 				targetChannel->OperatorPrivilege(false, clientID);
 				param_count++;
 			}
-			if (mode.find("l") != std::string::npos)
+			else if (mode[i] == 'l')
 			{
 				targetChannel->setUserLimited(false);
 				targetChannel->setMaxUser(-1);
