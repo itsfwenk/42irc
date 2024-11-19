@@ -27,6 +27,7 @@ class Client {
 		time_t const& getAcceptedAt(void);
 		bool const& isLoggedIn(void);
 		Server* getServer(void);
+		std::map<const int, Channel*> getJoinedChannelsMap();
 
 		// Setters
 		void parseMessageData(std::string messageData);

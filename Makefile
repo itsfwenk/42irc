@@ -2,7 +2,7 @@ NAME 			= ircserv
 CC				= c++
 
 CLASSES_SRCS	= Channel.cpp Client.cpp Command.cpp Server.cpp
-COMMANDS_SRCS	= BOT.cpp CAP.cpp NICK.cpp PASS.cpp PING.cpp USER.cpp
+COMMANDS_SRCS	= BOT.cpp CAP.cpp NICK.cpp PASS.cpp PING.cpp USER.cpp QUIT.cpp
 UTILS_SRCS		= ft_convert.cpp ft_formatmessage.cpp ft_print.cpp ft_setsockopts.cpp RPN.cpp
 MAIN_SRCS		= ft_irc.cpp
 

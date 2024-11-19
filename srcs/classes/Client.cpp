@@ -145,12 +145,21 @@ void Client::sendMessage(std::string message, Channel* channel) {
 };
 
 void Client::sendMessageToMyChannels(std::string message) {
+	std::map<const int, Channel*> channels = this->getJoinedChannelsMap();
+
+	for (std::map<const int, Channel*>::iterator it = channels.begin(); it != channels.end(); it++)
+			it->second->sendMessage(message);
+};
+
+std::map<const int, Channel*> Client::getJoinedChannelsMap() {
+	std::map<const int, Channel*> joinedChannels;
 	int userId = this->getID();
 	Server* server = this->getServer();
-	std::map<const int, Channel*> channels = server->getChannels();
+	std::map<const int, Channel*> allChannels = server->getChannels();
 
-	for (std::map<const int, Channel*>::iterator it = channels.begin(); it != channels.end(); it++) {
+	for (std::map<const int, Channel*>::iterator it = allChannels.begin(); it != allChannels.end(); ++it)
 		if (it->second->isInChannel(userId))
-			it->second->sendMessage(message);
-	}
+			joinedChannels[it->first] = it->second;
+
+	return (joinedChannels);
 };
