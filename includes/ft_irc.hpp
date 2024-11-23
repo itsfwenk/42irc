@@ -54,7 +54,7 @@ void 		print_error(std::string error);
 # define BOLD "\e[1m"
 
 // Defines
-# define DEFAULT_NAME "FORTY_TWO"
+# define DEFAULT_NAME ""
 # define CRLF "\r\n"
 # define MESSAGE_SIZE 1024
 # define CHANNEL_NAME_MAX_LEN 200

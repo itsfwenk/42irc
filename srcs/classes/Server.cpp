@@ -42,8 +42,7 @@ std::vector<pollfd>& Server::getPollFds(void) {
 };
 
 bool Server::isNicknameAlreadyUsed(std::string nickname) {
-	Client* selectedClient = this->getClientByNickname(nickname);
-	return selectedClient && selectedClient->isLoggedIn() && selectedClient->getNickname() == nickname;
+	return !!this->getClientByNickname(nickname);
 };
 
 bool Server::isChannelNameAlreadyUsed(std::string name) {
