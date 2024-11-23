@@ -1,28 +1,20 @@
 #include "Command.hpp"
 
-Command::Command(std::string name, int reqargs, bool opcmd, bool mustbelogged, bool insidechannel): _name(name), _reqargs(reqargs), _opcmd(opcmd), _mustbelogged(mustbelogged), _insidechannel(insidechannel) {
-	ft_print_info("Command " + name + " loaded!");
+Command::Command(std::string name, int requiredParamsNumber, bool mustBeLoggedIn): _name(name), _requiredParamsNumber(requiredParamsNumber), _mustBeLoggedIn(mustBeLoggedIn) {
+    print_colored("[COMMAND LOADED] " + name + " command loaded successfully!", CYAN);
 };
 
 Command::~Command(void) {};
 
 // Getters
 std::string const& Command::getName(void) {
-	return this->_name;
+    return this->_name;
 };
 
-int const& Command::getReqArgs(void) {
-	return this->_reqargs;
+int const& Command::getRequiredParamsNumber(void) {
+    return this->_requiredParamsNumber;
 };
 
-bool const& Command::isOpCMD(void) {
-	return this->_opcmd;
-};
-
-bool const& Command::mustBeLogged(void) {
-	return this->_mustbelogged;
-};
-
-bool const& Command::insideChannel(void) {
-	return this->_insidechannel;
+bool const& Command::mustBeLoggedIn(void) {
+    return this->_mustBeLoggedIn;
 };

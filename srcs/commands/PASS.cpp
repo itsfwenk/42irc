@@ -1,16 +1,19 @@
 #include "PASS.hpp"
 
-PASS::PASS(void): Command("PASS", 1, false, false, false) {};
+PASS::PASS(void): Command("PASS", 1, false) {};
 PASS::~PASS(void) {};
 
-void PASS::run(Client* client, Channel* channel, std::vector<std::string> params) {
-	if (client->isLoggedIn())
-		return client->sendMessage(ft_formatmessage(ERR_ALREADYREGISTERED, "You are already logged in!", client, channel), channel);
+void PASS::execute(Server* server, Client* client, IRCMessage message, std::vector<execReturnData>& execReturn) {
+    execReturnData returnData = server->createBasicExecReturnData(client->getFd());
+    std::string password = message.params[0];
 
-	std::string password = params[0];
-	if (password != client->getServer()->getPassword())
-		return client->sendMessage(ft_formatmessage(ERR_PASSWDMISMATCH, "Wrong password.", client, channel), channel);
+    if (!client->isPasswordNeeded()) {
+        returnData.message = ERR_ALREADYREGISTERED(client->getNickname());
+    } else if (server->getPassword() != password) {
+        returnData.message = ERR_PASSWDMISMATCH(client->getNickname());
+    } else
+        client->setIsPasswordNeeded(false);
 
-	client->setLoggedIn(true);
-	return client->sendMessage(ft_formatmessage(RPL_WELCOME, "Welcome to the IRC server!", client, channel), channel);
+    if (!returnData.message.empty())
+        execReturn.push_back(returnData);
 };

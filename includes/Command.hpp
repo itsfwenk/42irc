@@ -2,36 +2,36 @@
 #ifndef COMMAND_HPP
 # define COMMAND_HPP
 
+# include <string>
 # include <vector>
-# include <limits>
-# include "utils.hpp"
 
-class Channel;
+class Server;
 class Client;
+
+struct IRCMessage;
+struct execReturnData;
+
 class Command {
-	private:
-		std::string 	_name;
-		int				_reqargs;
-		bool			_opcmd;
-		bool			_mustbelogged;
-		bool			_insidechannel;
+    private:
+        std::string     _name;
+        int             _requiredParamsNumber;
+        bool            _mustBeLoggedIn;
 
-	public:
-		Command(std::string name, int reqargs, bool opcmd, bool mustbelogged, bool insidechannel);
-		virtual ~Command(void);
+    public:
+        Command(std::string name, int requiredParamsNumber, bool mustBeLogggedIn);
+        virtual ~Command(void);
 
-		// Getters
-		std::string const& getName(void);
-		int const& getReqArgs(void);
-		bool const& isOpCMD(void);
-		bool const& mustBeLogged(void);
-		bool const& insideChannel(void);
+        // Getters
+        std::string const& getName(void);
+        int const& getRequiredParamsNumber(void);
+        bool const& mustBeLoggedIn(void);
 
-		// Run
-		virtual void run(Client* client, Channel* channel, std::vector<std::string> params) = 0;
+        // Execute
+        virtual void execute(Server* server, Client* client, IRCMessage message, std::vector<execReturnData>& execReturn) = 0;
 };
 
-# include "Channel.hpp"
+# include "Server.hpp"
 # include "Client.hpp"
+# include "ft_irc.hpp"
 
 #endif

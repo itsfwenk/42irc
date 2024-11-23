@@ -2,43 +2,80 @@
 #ifndef CLIENT_HPP
 # define CLIENT_HPP
 
-# include <sstream>
-# include <ctime>
-# include "utils.hpp"
+# include "ft_irc.hpp"
 
 class Server;
+class Command;
+
+struct execReturnData;
+struct IRCMessage;
+
 class Client {
-	private:
-		int 			_id;
-		std::string		_username;
-		std::string		_nickname;
-		bool			_loggedIn;
-		time_t			_acceptedAt;
-		std::string		_messageData;
-		Server*			_server;
+    private:
+        int                         _fd;
+        time_t                      _acceptedAt;
+        bool                        _isPasswordNeeded;
+        bool                        _hasUsedQuitCommand;
 
-	public:
-		Client(int id, Server* server);
+        std::string                 _nickname;
+        std::string                 _username;
+        std::string                 _hostname;
+        std::string                 _servername;
+        std::string                 _realname;
 
-		// Getters
-		int const& getID(void);
-		std::string const& getUsername(void);
-		std::string const& getNickname(void);
-		time_t const& getAcceptedAt(void);
-		bool const& isLoggedIn(void);
-		Server* getServer(void);
+        std::string                 _inData;
+        std::string                 _outData;
+        std::vector<std::string>    _joinedChannelsNames;
 
-		// Setters
-		void parseMessageData(std::string messageData);
-		void setUsername(std::string username);
-		void setNickname(std::string nickname);
-		void setLoggedIn(bool loggedIn);
+        Server*                     _server;
 
-		// Commands
-		void execCommand(std::string command);
-		void sendMessage(std::string message, Channel* channel);
+    public:
+        Client(int fd, Server* server);
+
+        // Getters
+        int const& getFd(void);
+        time_t const& getAcceptedAt(void);
+        bool const& isPasswordNeeded(void);
+        bool const& hasUsedQuitCommand(void);
+        bool isLoggedIn(void);
+
+        std::string const& getNickname(void);
+        std::string const& getUsername(void);
+        std::string const& getHostname(void);
+        std::string const& getServername(void);
+        std::string const& getRealname(void);
+
+        std::string getFullUserId(void);
+
+        std::string& getInData(void);
+        std::string& getOutData(void);
+        std::vector<std::string>& getJoinedChannelsNames(void);
+
+        std::vector<int> getJoinedChannelsClientsFds(void);
+
+        Server* getServer(void);
+
+        // Setters
+        void setIsPasswordNeeded(bool isPasswordNeeded);
+        void setHasUsedQuitCommand(bool hasUsedQuitCommand);
+        
+        void setNickname(std::string nickname);
+        void setUsername(std::string username);
+        void setHostname(std::string hostname);
+        void setServername(std::string servername);
+        void setRealname(std::string realname);
+
+        void joinChannel(std::string name);
+        void partChannel(std::string name);
+
+        // Parser
+        void parseInData(void);
+
+        // Exec
+        std::vector<execReturnData> execParsedMessage(IRCMessage parsedMessage);
 };
 
 # include "Server.hpp"
+# include "Command.hpp"
 
 #endif

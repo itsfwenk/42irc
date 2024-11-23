@@ -5,11 +5,11 @@
 # include "Command.hpp"
 
 class CAP : public Command {
-	public:
-		CAP(void);
-		virtual ~CAP(void);
+    public:
+        CAP(void);
+        virtual ~CAP(void);
 
-		virtual void run(Client* client, Channel* channel, std::vector<std::string> params);
+        virtual void execute(Server* server, Client* client, IRCMessage message, std::vector<execReturnData>& execReturn);
 };
 
 #endif

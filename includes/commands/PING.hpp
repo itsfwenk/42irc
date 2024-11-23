@@ -5,11 +5,11 @@
 # include "Command.hpp"
 
 class PING : public Command {
-	public:
-		PING(void);
-		virtual ~PING(void);
+    public:
+        PING(void);
+        virtual ~PING(void);
 
-		virtual void run(Client* client, Channel* channel, std::vector<std::string> params);
+        virtual void execute(Server* server, Client* client, IRCMessage message, std::vector<execReturnData>& execReturn);
 };
 
 #endif

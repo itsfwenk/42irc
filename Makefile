@@ -2,25 +2,29 @@ NAME 			= ircserv
 CC				= c++
 
 CLASSES_SRCS	= Channel.cpp Client.cpp Command.cpp Server.cpp
-COMMANDS_SRCS	= BOT.cpp CAP.cpp NICK.cpp PASS.cpp PING.cpp USER.cpp
-UTILS_SRCS		= ft_convert.cpp ft_formatmessage.cpp ft_print.cpp ft_setsockopts.cpp RPN.cpp
+COMMANDS_SRCS	= CAP.cpp NICK.cpp PASS.cpp PING.cpp  QUIT.cpp USER.cpp
+UTILS_SRCS		= print_utils.cpp
 MAIN_SRCS		= ft_irc.cpp
 
 SOURCES			= $(addprefix srcs/classes/, $(CLASSES_SRCS)) \
 				  $(addprefix srcs/commands/, $(COMMANDS_SRCS)) \
 				  $(addprefix srcs/utils/, $(UTILS_SRCS)) \
- 				  $(addprefix srcs/, $(MAIN_SRCS))
+				  $(addprefix srcs/, $(MAIN_SRCS))
 OBJECTS			= $(SOURCES:.cpp=.o)
 OBJECTS_FOLDER  = $(addprefix objs/, $(OBJECTS))
 
-HEADERS_FILES	= Channel.hpp Client.hpp Command.hpp RPN.hpp Server.hpp utils.hpp
-CMD_HEADERS		= CAP.hpp NICK.hpp PASS.hpp PING.hpp USER.hpp
+CMD_HEADERS		= CAP.hpp NICK.hpp PASS.hpp PING.hpp QUIT.hpp USER.hpp
+HEADERS_FILES	= Channel.hpp Client.hpp Command.hpp ft_irc.hpp replies.hpp Server.hpp
 
 HEADERS			= $(addprefix includes/commands/, $(CMD_HEADERS)) \
 				  $(addprefix includes/, $(HEADERS_FILES))
 
-FLAGS 			= -Wall -Wextra -Werror -g3 -std=c++98
+FLAGS 			= -Wall -Wextra -Werror -std=c++98
 OPTIONS 		= -I includes -I includes/commands
+
+ifeq ($(DEBUG), true)
+	FLAGS += -g3
+endif
 
 #################################################################################
 

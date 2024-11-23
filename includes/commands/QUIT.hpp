@@ -1,13 +1,13 @@
 #pragma once
-#ifndef NICK_HPP
-# define NICK_HPP
+#ifndef QUIT_HPP
+# define QUIT_HPP
 
 # include "Command.hpp"
 
-class NICK : public Command {
+class QUIT : public Command {
     public:
-        NICK(void);
-        virtual ~NICK(void);
+        QUIT(void);
+        virtual ~QUIT(void);
 
         virtual void execute(Server* server, Client* client, IRCMessage message, std::vector<execReturnData>& execReturn);
 };

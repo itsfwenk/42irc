@@ -1,8 +1,10 @@
 #include "PING.hpp"
 
-PING::PING(void): Command("PING", 1, false, false, false) {};
+PING::PING(void): Command("PING", 1, false) {};
 PING::~PING(void) {};
 
-void PING::run(Client* client, Channel* channel, std::vector<std::string> params) {
-    return client->sendMessage(params[0], channel);
+void PING::execute(Server* server, Client* client, IRCMessage message, std::vector<execReturnData>& execReturn) {
+    execReturnData returnData = server->createBasicExecReturnData(client->getFd());
+    returnData.message = RPL_PONG(client->getFullUserId(), message.params[0]);
+    execReturn.push_back(returnData);
 };

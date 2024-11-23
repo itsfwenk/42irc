@@ -1,157 +1,144 @@
 #include "Channel.hpp"
 
-Channel::Channel(std::string name, Server* server) : _id(std::time(NULL)), _name(name), _server(server)
-{
-}
+Channel::Channel(std::string name, Server* server, Client* client): _name(name), _server(server) {
+	int clientFd = client->getFd();
+	
+	this->_joinedClientsFds.push_back(clientFd);
+	this->_operatorsClientsFds.push_back(clientFd);
+	client->joinChannel(name);
 
-Channel::~Channel()
-{
-}
-
-time_t const& Channel::getID(void)
-{
-	return this->_id;
+	print_info(name + " channel created successfully!");
 };
 
-int const& Channel::getMaxUser(void)
-{
-	return this->_maxUsers;
-}
-
-bool const& Channel::isUserLimited(void)
-{
-	return this->_userLimited;
-}
-
-bool const& Channel::isRestricted(void)
-{
-	return this->_restricted;
-}
-
-bool const& Channel::isInviteOnly(void)
-{
-	return this->_inviteOnly;
-}
-
-bool const& Channel::isTopicRestricted(void)
-{
-	return this->_topicRestricted;
-}
-
-std::string const& Channel::getPassword(void)
-{
-	return this->_password;
-}
-
-std::string const& Channel::getName(void)
-{
+// Getters
+std::string const& Channel::getName(void) {
 	return this->_name;
-}
+};
 
-std::string const& Channel::getTopic(void)
-{
+std::string const& Channel::getTopic(void) {
 	return this->_topic;
-}
+};
 
-std::vector<const int>	&Channel::getOperators(void)
-{
-	return this->_op;
-}
+std::string const& Channel::getPassword(void) {
+	return this->_password;
+};
 
-std::vector<const int>	&Channel::getClientIDs(void)
-{
-	return this->_clientsIDs;
-}
+std::vector<std::string>& Channel::getModes(void) {
+	return this->_modes;
+};
 
-Server* Channel::getServer(void)
-{
-	return (this->_server);
-}
+int const& Channel::getMaxUsers(void) {
+	return this->_maxUsers;
+};
 
-bool Channel::isOperator(const int &clientID)
-{
-	std::vector<const int> operators = this->getOperators();
-	std::vector<const int>::iterator it = std::find(operators.begin(), operators.end(), clientID);
+std::vector<int>& Channel::getOperatorsClientsFds(void) {
+	return this->_operatorsClientsFds;
+};
 
-	return (it != operators.end());
-}
+std::vector<int>& Channel::getJoinedClientsFds(void) {
+	return this->_joinedClientsFds;
+};
 
-int Channel::countOperators()
-{
-	std::vector<const int> op = this->getOperators();
-	return (op.size());
-}
+std::vector<int>& Channel::getInvitedClientsFds(void) {
+	return this->_invitedClientsFds;
+};
 
-bool Channel::isInChannel(const int &clientID)
-{
-	std::vector<const int> channelClients = this->getClientIDs();
-	std::vector<const int>::iterator it = std::find(channelClients.begin(), channelClients.end(), clientID);
+bool Channel::isOperator(int clientFd) {
+	std::vector<int>& operatorsClientsFds = this->getOperatorsClientsFds();
+	std::vector<int>::iterator it = std::find(operatorsClientsFds.begin(), operatorsClientsFds.end(), clientFd);
+	return it != operatorsClientsFds.end();
+};
 
-	return (it != channelClients.end());
-}
+bool Channel::hasJoined(int clientFd) {
+	std::vector<int>& joinedClientsFds = this->getJoinedClientsFds();
+	std::vector<int>::iterator it = std::find(joinedClientsFds.begin(), joinedClientsFds.end(), clientFd);
+	return it != joinedClientsFds.end();
+};
 
-// void Channel::cmd_kick(Client	&executor, Client	&target)
-// {
-// 	if (Channel::isOperator(executor) == true
-// 		&& Channel::countOperators() > 0)
-// 	{
+bool Channel::isInvited(int clientFd) {
+	std::vector<int>& invitedClientsFds = this->getInvitedClientsFds();
+	std::vector<int>::iterator it = std::find(invitedClientsFds.begin(), invitedClientsFds.end(), clientFd);
+	return it != invitedClientsFds.end();
+};
 
-// 	}
-// }
-void Channel::sendMessage(std::string message)
-{
-	Server* server = this->getServer();
-	std::map<const int, Client*>	clients = server->getClients();
-	std::vector<const int> channelClientIDs = this->getClientIDs();
+bool Channel::hasMode(std::string mode) {
+	std::vector<std::string>& modes = this->getModes();
+	std::vector<std::string>::iterator it = std::find(modes.begin(), modes.end(), mode);
+	return it != modes.end();
+};
 
-	for (std::vector<const int>::iterator it = channelClientIDs.begin(); it != channelClientIDs.end(); it++)
-	{
-		Client *user = server->getClientByID(it->first);
-		if (user)
-			user->sendMessage(message, NULL);
-	}
-}
+int Channel::getJoinedClientsCount(void) {
+	std::vector<int>& joinedClientsFds = this->getJoinedClientsFds();
+	return (int)joinedClientsFds.size();
+};
 
-void Channel::setInviteOnly(bool inviteOnly)
-{
-	this->_inviteOnly = inviteOnly;
-}
+Server* Channel::getServer(void) {
+	return this->_server;
+};
 
-void Channel::setTopicRestricted(bool topicRestricted)
-{
-	this->_topicRestricted = topicRestricted;
-}
+// Setters
+void Channel::setTopic(std::string topic) {
+	this->_topic = topic;
+};
 
-void Channel::setRestricted(bool restricted)
-{
-	this->_restricted = restricted;
-}
-
-void Channel::setPassword(std::string password)
-{
+void Channel::setPassword(std::string password) {
 	this->_password = password;
-}
+};
 
-void Channel::OperatorPrivilege(bool grant, const int &clientID)
-{
-	if (grant)
-		this->_op.push_back(clientID);
-	else
-		this->_op.erase(std::remove(this->_op.begin(), this->_op.end(), clientID), this->_op.end());
-}
+void Channel::addMode(std::string mode) {
+	std::vector<std::string>& modes = this->getModes();
+	modes.push_back(mode);
+};
 
-void Channel::setUserLimited(bool userLimited)
-{
-	this->_userLimited = userLimited;
-}
+void Channel::rmMode(std::string mode) {
+	std::vector<std::string>& modes = this->getModes();
+	std::vector<std::string>::iterator it = std::find(modes.begin(), modes.end(), mode);
+	if (it != modes.end())
+		modes.erase(it);
+};
 
-void Channel::setMaxUser(int maxUser)
-{
-	this->_maxUsers = maxUser;
-}
+void Channel::setMaxUsers(int maxUsers) {
+	this->_maxUsers = maxUsers;
+};
 
-void Channel::rmClient(const int &clientID)
-{
-	std::vector<const int> &channelClientIDs = this->_clientsIDs;
-	channelClientIDs.erase(std::remove(channelClientIDs.begin(), channelClientIDs.end(), clientID), channelClientIDs.end());
-}
+void Channel::grantOperator(int clientFd) {
+	std::vector<int>& operatorsClientsFds = this->getOperatorsClientsFds();
+	operatorsClientsFds.push_back(clientFd);
+};
+
+void Channel::ungrantOperator(int clientFd) {
+	std::vector<int>& operatorsClientsFds = this->getOperatorsClientsFds();
+	std::vector<int>::iterator it = std::find(operatorsClientsFds.begin(), operatorsClientsFds.end(), clientFd);
+	if (it != operatorsClientsFds.end())
+		operatorsClientsFds.erase(it);
+};
+
+void Channel::join(int clientFd) {
+	std::vector<int>& joinedClientsFds = this->getJoinedClientsFds();
+	joinedClientsFds.push_back(clientFd);
+};
+
+void Channel::part(int clientFd) {
+	Server* server = this->getServer();
+	std::vector<int>& joinedClientsFds = this->getJoinedClientsFds();
+	std::vector<int>::iterator it = std::find(joinedClientsFds.begin(), joinedClientsFds.end(), clientFd);
+	if (it != joinedClientsFds.end())
+		joinedClientsFds.erase(it);
+	if (!joinedClientsFds.size()) {
+		std::string name = this->getName();
+		server->rmChannel(name);
+		print_info(name + " channel has been removed! (No more clients inside)");
+	};
+};
+
+void Channel::invite(int clientFd) {
+	std::vector<int>& invitedClientsFds = this->getInvitedClientsFds();
+	invitedClientsFds.push_back(clientFd);
+};
+
+void Channel::uninvite(int clientFd) {
+	std::vector<int>& invitedClientsFds = this->getInvitedClientsFds();
+	std::vector<int>::iterator it = std::find(invitedClientsFds.begin(), invitedClientsFds.end(), clientFd);
+	if (it != invitedClientsFds.end())
+		invitedClientsFds.erase(it);
+};

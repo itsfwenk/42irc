@@ -2,83 +2,93 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-# define MAX_CLIENTS 100
-# define BUFFER_SIZE 1024
+# include "ft_irc.hpp"
 
-# include <string>
-# include <signal.h>
-# include <cstring>
-# include <poll.h>
-# include <sstream>
-# include <map>
-# include <vector>
-# include <ctime>
+class Client;
+class Channel;
+class Command;
+
+struct execReturnData;
+
+class Server {
+	private:
+		int			_fd;
+		int			_port;
+		std::string	_password;
+		time_t		_launchedAt;
+
+		std::map<int, Client> _clients;
+		std::map<std::string, Command*> _commands;
+		std::map<std::string, Channel> _channels;
+		std::vector<pollfd> _pollFds;
+
+		static bool	_isRunning;
+		static int	_exitStatus;
+
+	public:
+		Server(std::string port, std::string password);
+
+		// Getters
+		int const& getFd(void);
+		int const& getPort(void);
+		std::string const& getPassword(void);
+		time_t const& getLaunchedAt(void);
+
+		std::map<int, Client>& getClients(void);
+		std::map<std::string, Command*>& getCommands(void);
+		std::map<std::string, Channel>& getChannels(void);
+		std::vector<pollfd>& getPollFds(void);
+
+		bool const& isRunning(void);
+		int const& getExitStatus(void);
+
+		pollfd getServerPollFd(void);
+
+		bool isNicknameAlreadyUsed(std::string nickname);
+		bool isChannelNameAlreadyUsed(std::string name);
+
+		std::vector<int> getClientsFds(void);
+
+		// Getters by value
+		Client* getClientByFd(int clientFd);
+		Client* getClientByNickname(std::string nickname);
+
+		Command* getCommandByName(std::string name);
+
+		Channel* getChannelByName(std::string name);
+ 
+		// Setters
+		void setFd(int fd);
+		void setLaunchedAt(time_t launchedAt);
+
+		void setIsRunning(bool isRunning);
+		void setExitStatus(int exitStatus);
+		void setupSignals(void);
+		void setupCommands(void);
+
+		void rmClient(int clientFd);
+		void rmChannel(std::string name);
+
+		// Static
+		static int validatePort(std::string port);
+		static std::string validatePassword(std::string password);
+		static void signalHandler(int status);
+		static void setSocketOptions(int socketFd);
+		static pollfd getClientPollFd(int clientFd);
+
+		static execReturnData createBasicExecReturnData(int fd);
+	
+		static bool isCorrectNickname(std::string nickname);
+		static bool isCorrectChannelName(std::string name);
+		static bool isCorrectTopic(std::string topic);
+		static bool containsForbiddenChararacters(std::string str);
+
+		// Launcher
+		void launch(void);
+		void cleanup(void);
+};
 
 # include "Channel.hpp"
 # include "Client.hpp"
-# include "utils.hpp"
-
-// Commands
-# include "BOT.hpp"
-# include "CAP.hpp"
-# include "INVITE.hpp"
-# include "KICK.hpp"
-# include "MODE.hpp"
-# include "NICK.hpp"
-# include "PASS.hpp"
-# include "PING.hpp"
-# include "TOPIC.hpp"
-# include "USER.hpp"
-
-class Command;
-class Server {
-    private:
-        int                             _sockfd;
-        int                             _port;
-        std::string                     _password;
-        static bool                     _running;
-        static int                      _exitStatus;
-
-        std::map<const int, Channel*>   _channels;
-        std::map<const int, Client*>    _clients;
-        std::map<std::string, Command*> _commands;
-
-    public:
-        Server(std::string port, std::string password);
-        ~Server(void);
-
-        void addChannel(Channel* channel);
-        void addClient(Client* client);
-
-        void rmChannel(int channelId);
-        void rmClient(int clientId);
-
-        // Getters
-        int const& getSockFD(void);
-        int const& getPort(void);
-        std::string const& getPassword(void);
-        bool const& isRunning(void);
-        int const& getExitStatus(void);
-
-        std::map<const int, Channel*>& getChannels(void);
-        std::map<const int, Client*>& getClients(void);
-        std::map<std::string, Command*>& getCommands(void);
-
-        Channel* getChannelByID(int channelId);
-        Client* getClientByID(int clientId);
-        Client* getClientByNickname(std::string nickname);
-
-        Command* getCommandByName(std::string name);
-        Channel* getChannelByName(std::string name);
-
-        // Setters
-        static void signalHandler(int status);
-
-        // Launcher
-        void launch(void);
-        void sendMessage(std::string message);
-};
-
-# include "Command.hpp"
 
 #endif

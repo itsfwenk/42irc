@@ -1,22 +1,24 @@
 #include "NICK.hpp"
 
-NICK::NICK(void): Command("NICK", 1, false, false, false) {};
+NICK::NICK(void): Command("NICK", 0, false) {};
 NICK::~NICK(void) {};
 
-void NICK::run(Client* client, Channel* channel, std::vector<std::string> params) {	
-    std::string oldnickname = client->getNickname();
-	std::string nickname = params[0];
+void NICK::execute(Server* server, Client* client, IRCMessage message, std::vector<execReturnData>& execReturn) {
+    execReturnData returnData = server->createBasicExecReturnData(client->getFd());
 
-    if (!nickname.length()) {
-        return client->sendMessage(ft_formatmessage(ERR_NONICKNAMEGIVEN, "No nickname given.", client, channel), channel);
-    };
+    std::string nickname = message.params.size() ? message.params[0] : "";
+    std::string oldNickname = client->getNickname();
 
-	try {
+    if (nickname.empty()) {
+        returnData.message = ERR_NONICKNAMEGIVEN(oldNickname);
+    } else if (!server->isCorrectNickname(nickname)) {
+        returnData.message = ERR_ERRONEUSNICKNAME(oldNickname, nickname);
+    } else if (server->isNicknameAlreadyUsed(nickname)) {
+        returnData.message = ERR_NICKNAMEINUSE(oldNickname, nickname);
+    } else {
+        returnData.message = RPL_NICK(client->getFullUserId(), nickname);
         client->setNickname(nickname);
-    } catch (std::exception &err) {
-        (void)err;
-        return client->sendMessage(ft_formatmessage(ERR_NICKNAMEINUSE, nickname, client, channel), channel);
     };
 
-    return client->sendMessage(":" + oldnickname + "!" + client->getUsername() + "@localhost NICK " + nickname, channel);
+    execReturn.push_back(returnData);
 };

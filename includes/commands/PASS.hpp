@@ -5,11 +5,11 @@
 # include "Command.hpp"
 
 class PASS : public Command {
-	public:
-		PASS(void);
-		virtual ~PASS(void);
+    public:
+        PASS(void);
+        virtual ~PASS(void);
 
-		virtual void run(Client* client, Channel* channel, std::vector<std::string> params);
+        virtual void execute(Server* server, Client* client, IRCMessage message, std::vector<execReturnData>& execReturn);
 };
 
 #endif
