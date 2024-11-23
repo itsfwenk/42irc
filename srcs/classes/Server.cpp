@@ -3,7 +3,7 @@
 bool Server::_isRunning = false;
 int Server::_exitStatus = 0;
 
-Server::Server(std::string port, std::string password) {
+Server::Server(std::string port, std::string password): _bot(NULL) {
 	this->_port = this->validatePort(port);
 	this->_password = this->validatePassword(password);
 };
@@ -11,6 +11,10 @@ Server::Server(std::string port, std::string password) {
 // Getters
 int const& Server::getFd(void) {
 	return this->_fd;
+};
+
+int const& Server::getBotFd(void) {
+	return this->_botFd;
 };
 
 int const& Server::getPort(void) {
@@ -23,6 +27,10 @@ std::string const& Server::getPassword(void) {
 
 time_t const& Server::getLaunchedAt(void) {
 	return this->_launchedAt;
+};
+
+Client* Server::getBot(void) {
+	return this->_bot;
 };
 
 std::map<int, Client>& Server::getClients(void) {
@@ -114,8 +122,16 @@ void Server::setFd(int fd) {
 	this->_fd = fd;
 };
 
+void Server::setBotFd(int botFd) {
+	this->_botFd = botFd;
+};
+
 void Server::setLaunchedAt(time_t launchedAt) {
 	this->_launchedAt = launchedAt;
+};
+
+void Server::setBot(Client* bot) {
+	this->_bot = bot;
 };
 
 void Server::setIsRunning(bool isRunning) {
@@ -148,6 +164,46 @@ void Server::setupCommands(void) {
 	commands.insert(std::pair<std::string, Command*>("PING", new PING));
 	commands.insert(std::pair<std::string, Command*>("QUIT", new QUIT));
 	commands.insert(std::pair<std::string, Command*>("USER", new USER));
+};
+
+void Server::setupBot(void) {
+	int botFd = socket(AF_INET, SOCK_STREAM, 0);
+
+	if (botFd < 0)
+		throw std::runtime_error("Cannot create the BOT client.");
+
+	sockaddr_in server_addr;
+	memset(&server_addr, 0, sizeof(server_addr));
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(this->getPort());
+	server_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+
+	if (connect(botFd, (sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+		close(botFd);
+		throw std::runtime_error("Cannot connect the BOT Client to the server.");
+	};
+	
+	std::string passCommand = "PASS " + this->getPassword() + CRLF;
+	std::string nickCommand = "NICK " BOT_NICKNAME CRLF;
+	std::string userCommand = "USER " BOT_USER CRLF;
+
+	if (send(botFd, passCommand.c_str(), passCommand.length(), MSG_NOSIGNAL) < 0) {
+		close(botFd);
+		throw std::runtime_error("Cannot run PASS command with the BOT Client.");
+	};
+
+	if (send(botFd, nickCommand.c_str(), nickCommand.length(), MSG_NOSIGNAL) < 0) {
+		close(botFd);
+		throw std::runtime_error("Cannot run NICK command with the BOT Client.");
+	};
+
+	if (send(botFd, userCommand.c_str(), userCommand.length(), MSG_NOSIGNAL) < 0) {
+		close(botFd);
+		throw std::runtime_error("Cannot run USER command with the BOT Client.");
+	};
+
+	this->setBotFd(botFd);
+	print_colored("[BOT LOGGED IN] " BOT_NICKNAME " BOT Client logged in successfully!", GREEN);
 };
 
 void Server::rmClient(int clientFd) {
@@ -304,6 +360,7 @@ void Server::launch(void) {
 	this->setLaunchedAt(std::time(NULL));
 	this->setupSignals();
 	this->setupCommands();
+	this->setupBot();
 	
 	print_colored("\n[SERVER LAUNCHED]: Port: " + getStringFromNumber(port) + " • " + "Password: " + this->getPassword(), PURPLE);
 	std::cout << std::endl;
@@ -424,5 +481,6 @@ void Server::cleanup(void) {
 	};
 	commands.clear();
 
+	close(this->getBotFd());
 	close(this->getFd());
 };

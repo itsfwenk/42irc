@@ -18,6 +18,10 @@ void NICK::execute(Server* server, Client* client, IRCMessage message, std::vect
     } else {
         returnData.message = RPL_NICK(client->getFullUserId(), nickname);
         client->setNickname(nickname);
+        if (nickname == BOT_NICKNAME) {
+            server->setBot(client);
+            print_success("BOT Client set up successfully!");
+        };
     };
 
     execReturn.push_back(returnData);

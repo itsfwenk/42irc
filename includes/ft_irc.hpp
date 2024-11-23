@@ -55,6 +55,8 @@ void 		print_error(std::string error);
 
 // Defines
 # define DEFAULT_NAME ""
+# define BOT_NICKNAME "ft_irbot"
+# define BOT_USER "ft_irbot 127.0.0.1 ft_irc :The almighty bot"
 # define CRLF "\r\n"
 # define MESSAGE_SIZE 1024
 # define CHANNEL_NAME_MAX_LEN 200

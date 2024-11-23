@@ -4,6 +4,7 @@ Channel::Channel(std::string name, Server* server, Client* client): _name(name),
 	int clientFd = client->getFd();
 	
 	this->_joinedClientsFds.push_back(clientFd);
+	this->_joinedClientsFds.push_back(server->getBot()->getFd());
 	this->_operatorsClientsFds.push_back(clientFd);
 	client->joinChannel(name);
 

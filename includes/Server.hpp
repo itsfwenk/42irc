@@ -13,9 +13,11 @@ struct execReturnData;
 class Server {
 	private:
 		int			_fd;
+		int			_botFd;
 		int			_port;
 		std::string	_password;
 		time_t		_launchedAt;
+		Client*		_bot;
 
 		std::map<int, Client> _clients;
 		std::map<std::string, Command*> _commands;
@@ -30,9 +32,11 @@ class Server {
 
 		// Getters
 		int const& getFd(void);
+		int const& getBotFd(void);
 		int const& getPort(void);
 		std::string const& getPassword(void);
 		time_t const& getLaunchedAt(void);
+		Client*	getBot(void);
 
 		std::map<int, Client>& getClients(void);
 		std::map<std::string, Command*>& getCommands(void);
@@ -59,12 +63,15 @@ class Server {
  
 		// Setters
 		void setFd(int fd);
+		void setBotFd(int botFd);
 		void setLaunchedAt(time_t launchedAt);
+		void setBot(Client* bot);
 
 		void setIsRunning(bool isRunning);
 		void setExitStatus(int exitStatus);
 		void setupSignals(void);
 		void setupCommands(void);
+		void setupBot(void);
 
 		void rmClient(int clientFd);
 		void rmChannel(std::string name);
