@@ -453,7 +453,14 @@ void Server::launch(void) {
 						selectedClient->parseInData();
 					};
 				} else {
+					Client* bot = this->getBot();
 					std::string& outData = selectedClient->getOutData();
+
+					if (bot && selectedClient->getFd() == bot->getFd()) {
+						outData.clear();
+						continue;
+					};
+
 					size_t pos = outData.find(CRLF);
 					if (pos != std::string::npos) {
 						std::string message = outData.substr(0, pos + 2);
