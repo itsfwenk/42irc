@@ -3,7 +3,7 @@
 bool Server::_isRunning = false;
 int Server::_exitStatus = 0;
 
-Server::Server(std::string port, std::string password): _bot(NULL) {
+Server::Server(std::string port, std::string password): _botFd(-1), _sentBasicBotData(false), _bot(NULL) {
 	this->_port = this->validatePort(port);
 	this->_password = this->validatePassword(password);
 };
@@ -19,6 +19,10 @@ int const& Server::getBotFd(void) {
 
 int const& Server::getPort(void) {
 	return this->_port;
+};
+
+bool const& Server::hasSentBasicBotData(void) {
+	return this->_sentBasicBotData;
 };
 
 std::string const& Server::getPassword(void) {
@@ -122,6 +126,10 @@ void Server::setBotFd(int botFd) {
 	this->_botFd = botFd;
 };
 
+void Server::setSentBasicBotData(bool sentBasicBotData) {
+	this->_sentBasicBotData = sentBasicBotData;
+};
+
 void Server::setLaunchedAt(time_t launchedAt) {
 	this->_launchedAt = launchedAt;
 };
@@ -180,25 +188,6 @@ void Server::setupBot(void) {
 	if (connect(botFd, (sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
 		close(botFd);
 		throw std::runtime_error("Cannot connect the BOT Client to the server.");
-	};
-	
-	std::string passCommand = "PASS " + this->getPassword() + CRLF;
-	std::string nickCommand = "NICK " BOT_NICKNAME CRLF;
-	std::string userCommand = "USER " BOT_USER CRLF;
-
-	if (send(botFd, passCommand.c_str(), passCommand.length(), MSG_NOSIGNAL) < 0) {
-		close(botFd);
-		throw std::runtime_error("Cannot run PASS command with the BOT Client.");
-	};
-
-	if (send(botFd, nickCommand.c_str(), nickCommand.length(), MSG_NOSIGNAL) < 0) {
-		close(botFd);
-		throw std::runtime_error("Cannot run NICK command with the BOT Client.");
-	};
-
-	if (send(botFd, userCommand.c_str(), userCommand.length(), MSG_NOSIGNAL) < 0) {
-		close(botFd);
-		throw std::runtime_error("Cannot run USER command with the BOT Client.");
 	};
 
 	this->setBotFd(botFd);
@@ -360,13 +349,14 @@ void Server::launch(void) {
 	this->setupSignals();
 	this->setupCommands();
 	this->setupBot();
-	
+
 	print_colored("\n[SERVER LAUNCHED]: Port: " + getStringFromNumber(port) + " • " + "Password: " + this->getPassword(), PURPLE);
-	std::cout << std::endl;
 	print_colored("[SERVER LOGS]:", BLUE);
 
+	int botFd = this->getBotFd();
 	std::vector<pollfd>& serverPollFds = this->getPollFds();
 	serverPollFds.push_back(this->getServerPollFd());
+	serverPollFds.push_back(this->getClientPollFd(botFd));
 
 	while (this->isRunning()) {
 		if (poll(serverPollFds.data(), serverPollFds.size(), -1) < 0) {
@@ -390,6 +380,26 @@ void Server::launch(void) {
 				serverPollFds.erase(serverPollFds.begin() + i--);
 				if (!getsockopt(pollFd, SOL_SOCKET, SO_ERROR, &error, &length))
 					print_warning("Error with the pollFd n°" + getStringFromNumber(pollFd) + ": " + strerror(error));
+			} else if (it->revents & POLLOUT && pollFd == botFd) {
+				if (!this->hasSentBasicBotData()) {
+					std::string logString;
+					logString += "PASS " + this->getPassword() + CRLF;
+					logString += "NICK " BOT_NICKNAME CRLF;
+					logString += "USER " BOT_USER CRLF;
+					send(pollFd, logString.c_str(), logString.size(), MSG_NOSIGNAL);
+					this->setSentBasicBotData(true);
+				} else {
+					Client* bot = this->getBot();
+					if (bot) {
+						std::string& inData = bot->getInData();
+						size_t pos = inData.find(CRLF);
+						if (pos != std::string::npos) {
+							std::string message = inData.substr(0, pos + 2);
+							send(pollFd, message.c_str(), message.length(), MSG_NOSIGNAL);
+							inData.erase(0, pos + 2);
+						};
+					};
+				};
 			} else if (it->revents & POLLIN && pollFd == fd) {
 				int clientFd = accept(fd, NULL, NULL);
 				if (clientFd < 0) {
@@ -479,13 +489,12 @@ void Server::cleanup(void) {
 		};
 	};
 	commands.clear();
-
-	close(this->getBotFd());
 	close(this->getFd());
 };
 
 void Server::runBotCommand(Client* client, Channel* channel, std::string message) {
 	Client* bot = this->getBot();
+	std::string& inData = bot->getInData();
 	std::vector<std::string> params = split(message, ' ');
 	std::string command = params[0];
 	params.erase(params.begin());
@@ -573,15 +582,11 @@ void Server::runBotCommand(Client* client, Channel* channel, std::string message
 		if (output[0] != 'P' && output[0] != 'J')
 			output = "PRIVMSG #" + channel->getName() + " :" + client->getNickname() + ": " + output + CRLF;
 		if (output[0] == 'J' || channel->hasJoined(bot->getFd())) {
-			if (!output.find("PART")) {
-				std::string partMessage = "PRIVMSG #" + channel->getName() + " :Bye bye everyone!" + CRLF;
-				send(this->getBotFd(), partMessage.c_str(), partMessage.size(), MSG_NOSIGNAL);
-			};
-			send(this->getBotFd(), output.c_str(), output.size(), MSG_NOSIGNAL);
-			if (output[0] == 'J') {
-				output = "PRIVMSG #" + channel->getName() + " :" + client->getNickname() + ": Thank you for adding me in your channel, you can do the !help command to get my commands!" + CRLF;
-				send(this->getBotFd(), output.c_str(), output.size(), MSG_NOSIGNAL);
-			};
+			if (!output.find("PART"))
+				inData += "PRIVMSG #" + channel->getName() + " :Bye bye everyone!" + CRLF;
+			inData += output;
+			if (output[0] == 'J')
+				inData += "PRIVMSG #" + channel->getName() + " :" + client->getNickname() + ": Thank you for adding me in your channel, you can do the !help command to get my commands!" + CRLF;
 		};
 	};
 };

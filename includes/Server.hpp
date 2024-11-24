@@ -15,6 +15,7 @@ class Server {
 		int			_fd;
 		int			_botFd;
 		int			_port;
+		bool		_sentBasicBotData;
 		std::string	_password;
 		time_t		_launchedAt;
 		Client*		_bot;
@@ -34,6 +35,7 @@ class Server {
 		int const& getFd(void);
 		int const& getBotFd(void);
 		int const& getPort(void);
+		bool const& hasSentBasicBotData(void);
 		std::string const& getPassword(void);
 		time_t const& getLaunchedAt(void);
 		Client*	getBot(void);
@@ -63,6 +65,7 @@ class Server {
 		// Setters
 		void setFd(int fd);
 		void setBotFd(int botFd);
+		void setSentBasicBotData(bool sentBasicBotData);
 		void setLaunchedAt(time_t launchedAt);
 		void setBot(Client* bot);
 
