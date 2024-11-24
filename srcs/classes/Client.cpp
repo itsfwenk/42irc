@@ -121,15 +121,10 @@ void Client::joinChannel(std::string name) {
 };
 
 void Client::partChannel(std::string name) {
-    Server* server = this->getServer();
     std::vector<std::string>& joinedChannelsNames = this->getJoinedChannelsNames();
     std::vector<std::string>::iterator it = std::find(joinedChannelsNames.begin(), joinedChannelsNames.end(), name);
-    if (it != joinedChannelsNames.end()) {
-        Channel* channel = server->getChannelByName(*it);
-        if (channel)
-			channel->part(this->getFd());
+    if (it != joinedChannelsNames.end())
         joinedChannelsNames.erase(it);
-    };
 };
 
 // Parser

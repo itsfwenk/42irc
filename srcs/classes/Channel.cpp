@@ -141,18 +141,27 @@ void Channel::ungrantOperator(int clientFd) {
 void Channel::join(int clientFd) {
 	std::vector<int>& joinedClientsFds = this->getJoinedClientsFds();
 	joinedClientsFds.push_back(clientFd);
+
+	Server* server = this->getServer();
+	Client* client = server->getClientByFd(clientFd);
+	if (client)
+		client->joinChannel(this->getName());
 };
 
 void Channel::part(int clientFd) {
-	Server* server = this->getServer();
 	std::vector<int>& joinedClientsFds = this->getJoinedClientsFds();
 	std::vector<int>::iterator it = std::find(joinedClientsFds.begin(), joinedClientsFds.end(), clientFd);
-	if (it != joinedClientsFds.end())
+	if (it != joinedClientsFds.end()) {
+		Server* server = this->getServer();
+		Client* client = server->getClientByFd(clientFd);
+		if (client)
+			client->partChannel(this->getName());
 		joinedClientsFds.erase(it);
-	if (!joinedClientsFds.size()) {
-		std::string name = this->getName();
-		server->rmChannel(name);
-		print_info(name + " channel has been removed! (No more clients inside)");
+		if (!joinedClientsFds.size()) {
+			std::string name = this->getName();
+			server->rmChannel(name);
+			print_info(name + " channel has been removed! (No more clients inside)");
+		};
 	};
 };
 

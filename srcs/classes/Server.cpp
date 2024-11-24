@@ -198,12 +198,15 @@ void Server::rmClient(int clientFd) {
 	std::map<int, Client>& clients = this->getClients();
 	std::map<int, Client>::iterator it = clients.find(clientFd);
 	if (it != clients.end()) {
-		std::map<std::string, Channel>& channels = this->getChannels();
-		for (std::map<std::string, Channel>::iterator it2 = channels.begin(); it2 != channels.end(); it2++) {
-			Channel channel = it2->second;
-			channel.ungrantOperator(clientFd);
-			channel.uninvite(clientFd);
-			channel.part(clientFd);
+		Client client = it->second;
+		std::vector<std::string> channels = client.getJoinedChannelsNames();
+		for (std::vector<std::string>::iterator it2 = channels.begin(); it2 != channels.end(); it2++) {
+			Channel* channel = this->getChannelByName(*it2);
+			if (channel) {
+				channel->uninvite(clientFd);
+				channel->ungrantOperator(clientFd);
+				channel->part(clientFd);
+			};
 		};
 		close(it->second.getFd());
 		clients.erase(it);
