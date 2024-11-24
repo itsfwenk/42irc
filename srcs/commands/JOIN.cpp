@@ -27,6 +27,7 @@ void JOIN::execute(Server* server, Client* client, IRCMessage message, std::vect
                     returnData.message += ERR_INVITEONLYCHAN(client->getNickname(), name) + CRLF;
                 else {
                     selectedChannel->join(client->getFd());
+                    selectedChannel->uninvite(client->getFd());
                     std::vector<int>& joinedChannelFds = selectedChannel->getJoinedClientsFds();
                     for (std::vector<int>::iterator it = joinedChannelFds.begin(); it != joinedChannelFds.end(); it++) {
                         Client* channelClient = server->getClientByFd(*it);
