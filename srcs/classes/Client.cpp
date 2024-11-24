@@ -208,7 +208,7 @@ std::vector<execReturnData> Client::execParsedMessage(IRCMessage parsedMessage) 
                               + getStringFromNumber(selectedCommand->getRequiredParamsNumber()) 
                               + " params (given " + getStringFromNumber(params.size()) + ").");
     } else if (!this->isLoggedIn() && selectedCommand->mustBeLoggedIn()) {
-        errorReturnData.message = ERR_NEEDMOREPARAMS(this->getNickname(), command);
+        errorReturnData.message = ERR_UNKNOWNCOMMAND(this->getNickname(), command);
         print_warning(command + " needs to be run by a logged in client.");
     };
 

@@ -53,10 +53,6 @@ bool Server::isNicknameAlreadyUsed(std::string nickname) {
 	return !!this->getClientByNickname(nickname);
 };
 
-bool Server::isChannelNameAlreadyUsed(std::string name) {
-	return !!this->getChannelByName(name);
-};
-
 std::vector<int> Server::getClientsFds(void) {
 	std::map<int, Client>& clients = this->getClients();
 	std::vector<int> clientsFds;
@@ -159,9 +155,12 @@ void Server::setupCommands(void) {
 	std::map<std::string, Command*>& commands = this->getCommands();
 
 	commands.insert(std::pair<std::string, Command*>("CAP", new CAP));
+	commands.insert(std::pair<std::string, Command*>("JOIN", new JOIN));
 	commands.insert(std::pair<std::string, Command*>("NICK", new NICK));
+	commands.insert(std::pair<std::string, Command*>("PART", new PART));
 	commands.insert(std::pair<std::string, Command*>("PASS", new PASS));
 	commands.insert(std::pair<std::string, Command*>("PING", new PING));
+	commands.insert(std::pair<std::string, Command*>("PRIVMSG", new PRIVMSG));
 	commands.insert(std::pair<std::string, Command*>("QUIT", new QUIT));
 	commands.insert(std::pair<std::string, Command*>("USER", new USER));
 };
@@ -483,4 +482,106 @@ void Server::cleanup(void) {
 
 	close(this->getBotFd());
 	close(this->getFd());
+};
+
+void Server::runBotCommand(Client* client, Channel* channel, std::string message) {
+	Client* bot = this->getBot();
+	std::vector<std::string> params = split(message, ' ');
+	std::string command = params[0];
+	params.erase(params.begin());
+
+	if (command[0] == BOT_PREFIX) {
+		command = command.substr(1);
+		std::string output = "Cannot find " + command + " bot command, you can check the bot commands list by using the !help command!";
+
+		if (!channel->hasJoined(bot->getFd())) {
+			if (command == "join")
+				output = "JOIN #" + channel->getName() + " " + channel->getPassword() + CRLF;
+		} else {
+			if (command == "join")
+				output = "I am already here ???";
+			else if (command == "rpn") {
+				std::string rpn;
+				for (std::vector<std::string>::iterator it = params.begin(); it != params.end(); it++)
+					rpn += *it + " ";
+
+				try {
+					output = "[RPN] The result of your RPN formula is: " + getStringFromNumber(RPN::doRPN(rpn)) + " !";
+				} catch (std::exception const& err) {
+					output = "[RPN] " + std::string(err.what());
+				};
+			} else if (command == "dice")
+				output = "[DICE] The dice result is: " + getStringFromNumber(rand() % 6 + 1) + " !";
+			else if (command == "flip") {
+				output = "[FLIP] The flip result is: " + std::string(rand() % 2 ? "Heads" : "Tails") + " !";
+			} else if (command == "troll") {
+				output = "Segmentation fault (Core trolled)";
+			} else if (command == "say") {
+ 				std::string say;
+
+				for (std::vector<std::string>::iterator it = params.begin(); it != params.end(); it++)
+					say += *it + " ";
+
+				output = "[SAY] " + client->getNickname() + " says: " + say;
+			} else if (command == "whoami") {
+				output = "[WHOAMI] You are " + client->getNickname()
+											+ (channel->isOperator(client->getFd()) ? ", an operator of this channel" : "") 
+											+ ", your username is: " + client->getUsername()
+											+ ", your realname is: " + client->getRealname()
+											+ " and you have joined this server at: " + getFormattedTime(client->getAcceptedAt()) + ".";
+			} else if (command == "part") {
+				std::string reason;
+				for (std::vector<std::string>::iterator it = params.begin(); it != params.end(); it++)
+					reason += *it + " ";
+
+				if (reason.empty())
+					reason = "No reason specified";
+
+				output = "PART #" + channel->getName() + " :" + reason + " (Removed by " + client->getNickname() + ")" + CRLF;
+			} else if (command == "help") {
+				std::string selectedCommand;
+
+				if (params.size() >= 1)
+					selectedCommand = params[1];
+				
+				if (!selectedCommand.empty()) {
+					output = "Cannot find " + selectedCommand + " help data.";
+					if (selectedCommand == "join")
+						output = "[HELP JOIN]: Usage: !join, brings the BOT to the channel.";
+					else if (selectedCommand == "rpn")
+						output = "[HELP RPN]: Usage: !rpn <RPN formula>, calculates the result of the RPN formula and returns it.";
+					else if (selectedCommand == "dice")
+						output = "[HELP DICE]: Usage: !dice, rolls a 6-faces dice and returns the result.";
+					else if (selectedCommand == "flip")
+						output = "[HELP FLIP]: Usage: !flip, flips a coin an returns if it is Heads or Tails.";
+					else if (selectedCommand == "troll")
+						output = "[HELP TROLL]: Usage: !troll, ??? :)";
+					else if (selectedCommand == "say")
+						output = "[HELP SAY]: Usage: !say <message>, says the message.";
+					else if (selectedCommand == "whoami")
+						output = "[HELP WHOAMI]: Usage: !whoami, gives informations about you.";
+					else if (selectedCommand == "part")
+						output = "[HELP PART]: Usage: !part, removes the BOT from the channel.";
+					else if (selectedCommand == "help")
+						output = "[HELP HELP]: Usage: !help <bot cmd>, returns the list of bot commands if cmd is not specified or the informations about the bot command elsewise.";
+				};
+
+				output = "[HELP] Bot commands list: join, rpn, dice, flip, troll, say, whoami, part, help.";
+			};
+		};
+
+		if (output[0] != 'P' && output[0] != 'J')
+			output = "PRIVMSG #" + channel->getName() + " :" + client->getNickname() + ": " + output + CRLF;
+		if (output[0] == 'J' || channel->hasJoined(bot->getFd())) {
+			if (!output.find("PART")) {
+				std::string partMessage = "PRIVMSG #" + channel->getName() + " :Bye bye everyone!" + CRLF;
+				send(this->getBotFd(), partMessage.c_str(), partMessage.size(), MSG_NOSIGNAL);
+			};
+			send(this->getBotFd(), output.c_str(), output.size(), MSG_NOSIGNAL);
+			if (output[0] == 'J') {
+				output = "PRIVMSG #" + channel->getName() + " :" + client->getNickname() + ": Thank you for adding me in your channel, you can do the !help command to get my commands!" + CRLF;
+				send(this->getBotFd(), output.c_str(), output.size(), MSG_NOSIGNAL);
+			};
+		};
+	};
 };

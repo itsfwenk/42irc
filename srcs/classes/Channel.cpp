@@ -4,7 +4,6 @@ Channel::Channel(std::string name, Server* server, Client* client): _name(name),
 	int clientFd = client->getFd();
 	
 	this->_joinedClientsFds.push_back(clientFd);
-	this->_joinedClientsFds.push_back(server->getBot()->getFd());
 	this->_operatorsClientsFds.push_back(clientFd);
 	client->joinChannel(name);
 
@@ -42,6 +41,31 @@ std::vector<int>& Channel::getJoinedClientsFds(void) {
 
 std::vector<int>& Channel::getInvitedClientsFds(void) {
 	return this->_invitedClientsFds;
+};
+
+std::string Channel::getChannelJoinInfos(Client* client) {
+	std::string infos;
+	std::string name = this->getName();
+
+	infos += RPL_JOIN(client->getFullUserId(), name) + CRLF;
+	std::string topic = this->getTopic();
+	if (!topic.empty())
+		infos += RPL_TOPIC(client->getNickname(), name, topic) + CRLF;
+
+	std::string nicknamesList;
+	std::vector<int>& joinedChannelFds = this->getJoinedClientsFds();
+	for (std::vector<int>::iterator it = joinedChannelFds.begin(); it != joinedChannelFds.end(); it++) {
+		Client* client = this->getServer()->getClientByFd(*it);
+		if (client) {
+			if (this->isOperator(*it))
+				nicknamesList += "@";
+			nicknamesList += client->getNickname() + " ";
+		};
+	};
+
+	infos += RPL_NAMREPLY(client->getNickname(), name, nicknamesList) + CRLF;
+	infos += RPL_ENDOFNAMES(client->getNickname(), name) + CRLF;
+	return infos;
 };
 
 bool Channel::isOperator(int clientFd) {

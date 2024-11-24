@@ -49,7 +49,6 @@ class Server {
 		pollfd getServerPollFd(void);
 
 		bool isNicknameAlreadyUsed(std::string nickname);
-		bool isChannelNameAlreadyUsed(std::string name);
 
 		std::vector<int> getClientsFds(void);
 
@@ -93,6 +92,7 @@ class Server {
 		// Launcher
 		void launch(void);
 		void cleanup(void);
+		void runBotCommand(Client* client, Channel* channel, std::string message);
 };
 
 # include "Channel.hpp"

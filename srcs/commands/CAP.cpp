@@ -5,7 +5,6 @@ CAP::~CAP(void) {};
 
 void CAP::execute(Server* server, Client* client, IRCMessage message, std::vector<execReturnData>& execReturn) {
     (void)server;
-    (void)client;
     execReturnData returnData = server->createBasicExecReturnData(client->getFd());
 
     std::string cmd = message.params[0];

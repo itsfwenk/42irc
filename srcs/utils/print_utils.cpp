@@ -14,6 +14,18 @@ std::string getStringFromNumber(int number) {
 	return oss.str();
 };
 
+std::string getStringFromNumber(double number) {
+	std::ostringstream oss;
+	oss << number;
+	return oss.str();
+};
+
+std::string getStringFromNumber(size_t number) {
+	std::ostringstream oss;
+	oss << number;
+	return oss.str();
+};
+
 // Printers
 void print_logo(void) {
 	print_colored("  /$$$$$$   /$$          /$$", CYAN);

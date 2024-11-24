@@ -13,6 +13,7 @@ int main(int argc, char** argv) {
 	std::string password = argv[2];
 
 	try {
+		srand(static_cast<unsigned int>(time(NULL)));
 		Server server(port, password);
 		server.launch();
 		server.cleanup();

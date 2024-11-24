@@ -32,6 +32,8 @@ class Channel {
 		std::vector<int>& getJoinedClientsFds(void);
 		std::vector<int>& getInvitedClientsFds(void);
 
+		std::string getChannelJoinInfos(Client* client);
+
 		bool isOperator(int clientFd);
 		bool hasJoined(int clientFd);
 		bool isInvited(int clientFd);
